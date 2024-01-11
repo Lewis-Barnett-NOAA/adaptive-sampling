@@ -279,3 +279,4 @@ fit_gam_st <- gam(
 
 plot(fit_gam_st)
 
+this life
