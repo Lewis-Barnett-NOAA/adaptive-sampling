@@ -108,38 +108,32 @@ bind_rows(index, index_c) %>%
   ylab("Biomass estimate (tonnes)")
 
 ############################
-fit <- sdmTMB(
-  density ~ 0 + year_factor + poly(log_depth, 2),
-  data = dat,
-  family = tweedie(link = "log"),
-  mesh = mesh,
-  spatial = "on",
-  spatiotemporal = "iid", #< new
-  time = "year", #< new
-  # silent = FALSE
-)
-fit
+#Sim data from scratch
+
+predictor_dat <- grid
+mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), cutoff = 10)
 sim_dat <- sdmTMB_simulate(
-  formula =  density ~ 0 + year_factor + poly(log_depth, 2),
-  data = dat,
-  time = "year",
+  formula = ~ 1,
+  data = predictor_dat,
   mesh = mesh,
-  family = tweedie(link = "log"),
-  range = 0.5,
-  sigma_E = 0.1,
-  phi = 0.1,
-  sigma_O = 1.23,
-  seed = 42,
-  B = c(1.23, 1.86) # B0 = intercept, B1 = a1 slope
+  family = poisson(link = "log"),
+  range = 0.3,
+  sigma_O = 0.4,
+  seed = 1,
+  B = 1 # B0 = intercept
 )
+head(sim_dat)
 
+#Sample 200 points for fitting
+set.seed(1)
+sim_dat_obs <- sim_dat[sample(seq_len(nrow(sim_dat)), 200), ]
 
-
-
-
-
-
-
+ggplot(sim_dat, aes(X, Y)) +
+  geom_raster(aes(fill = exp(eta))) + # mean without observation error
+  geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
 
 
 ##SAMPLING FUNCTIONS
