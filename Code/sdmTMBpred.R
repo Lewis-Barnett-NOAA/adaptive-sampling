@@ -138,6 +138,7 @@ ggplot(sim_dat, aes(X, Y)) +
 
 ##SAMPLING FUNCTIONS
 dat1 <- readRDS("Data/sim_dat_8s.rds")
+dat1
 
 filledContourPlot.fn <- function(dat, valueName="eta.scaled",...) {
   X <- as.numeric(names(table(dat$X)))
