@@ -54,21 +54,43 @@ predictor_dat <- expand.grid(
   Y = seq(0, 1, length.out = 100)
 )
 
-gradient_raster <- poly_gradient(predictor_dat, 180)
 
 #Operating model 1 constant state
-sim_dat <- sdmTMB_simulate(
+Model1 <- sdmTMB_simulate(
   formula = ~ 1,
   data = predictor_dat,
   mesh = mesh,
   family = poisson(link = "log"),
-  range = 1.4,
+  range = 0.01,
+  sigma_O = 0.5,
+  seed = 1,
+  B = 1  # B0 = intercept  # Add strata to the operating model
+)
+
+#North concentration
+Model2 <- sdmTMB_simulate(
+  formula = ~ 1,
+  data = predictor_dat,
+  mesh = mesh,
+  family = poisson(link = "log"),
+  range = 1,
   sigma_O = 0.2,
   seed = 1,
   B = 1  # B0 = intercept  # Add strata to the operating model
 )
 
-ggplot(sim_dat, aes(X, Y)) +
+#strong north concentration
+Model3 <- sdmTMB_simulate(
+  formula = ~ 1,
+  data = predictor_dat,
+  mesh = mesh,
+  family = poisson(link = "log"),
+  range = 2,
+  sigma_O = 0.1,
+  seed = 1,
+  B = 1  # B0 = intercept  # Add strata to the operating model
+)
+ggplot(Model3, aes(X, Y)) +
   geom_raster(aes(fill = exp(eta))) + # mean without observation error
   geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
   scale_fill_viridis_c() +
@@ -76,34 +98,3 @@ ggplot(sim_dat, aes(X, Y)) +
   coord_cartesian(expand = FALSE)
 
 ################
-
-Polygon1 <- Polygon(rbind(c(4498482, 2668272), c(4498482, 2669343),
-                          c(4499991, 2669343), c(4499991, 2668272)))
-Polygon1 <- Polygons(list(Polygon1), 1)
-Polygon1 <- SpatialPolygons(list(Polygon1))
-
-## Funcs ##############
-inv_atan2 <- function(angle) {
-  ## deg to rad
-  radian = angle * pi / 180 
-  ## invert atan2
-  x1 = cos(radian)
-  y1 = sin(radian)
-  return(cbind(x1, y1))
-}
-poly_gradient <- function(shape, angle) {
-  a = inv_atan2(angle)[1]
-  b = inv_atan2(angle)[2]
-  x = seq(-1, 1, len = 100)
-  y = seq(-1, 1, len = 100)
-  ras = raster(outer(x, y, function(x,y) {a * x + b * y}))
-  extent(ras) <- extent(shape)
-  projection(ras) <- proj4string(shape)
-  invisible(ras)
-}
-
-## Tests ##############
-r12 <- poly_gradient(Polygon1, angle = 180)
-plot(Polygon1)
-plot(r12, add = T)
-
