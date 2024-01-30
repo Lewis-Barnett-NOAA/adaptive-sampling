@@ -27,7 +27,6 @@ plot(mesh)
 
 ranges <- seq(5, 100, 5)
 
-
 for(i in 1:length(ranges)){
   sim_dat <- sdmTMB_simulate(
     formula = ~ 1 + depth,
