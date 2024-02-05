@@ -12,6 +12,8 @@ predictor_dat <- data.frame(
 
 predictor_dat
 
+strata <- ifelse(predictor_dat$Y >= 50, 1, 2)
+
 ggplot(predictor_dat, aes(X, Y)) +
   geom_tile(aes(fill = depth)) +
   scale_color_gradient2()
@@ -140,16 +142,25 @@ get_operating_model <- function(cold_pool_value) {
     
     sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
-    sim_dat_obs <- sim_dat[sample(seq_len(nrow(sim_dat)), 100), ]
-    plot1 <- ggplot(sim_dat, aes(X, Y)) +
+   
+    samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 20), ]
+    
+    
+    samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 100), ]
+    
+    
+    # Combine samples
+    sim_dat_obs <- rbind(samples_north,samples_south)
+   
+     plot1 <- ggplot(sim_dat, aes(X, Y)) +
       geom_raster(aes(fill = eta)) +
       geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
       scale_fill_viridis_c() +
       scale_size_area() +
       coord_cartesian(expand = FALSE)
-    return(list("Strong Gradient",plot1))
+    return(list("Strong Gradient",plot1, sim_dat_obs))
   } else if (cold_pool_value >= mid_range[1] && cold_pool_value <= mid_range[2]) {
-    sim_dat2 <- sdmTMB_simulate(
+    sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
       data = predictor_dat,
       mesh = mesh,
@@ -161,19 +172,28 @@ get_operating_model <- function(cold_pool_value) {
       seed = #42
     )
     
-    sim_dat2$eta <- (sim_dat2$eta - min(sim_dat2$eta))
-    sim_dat2$observed <- (sim_dat2$observed - min(sim_dat2$observed))
-    sim_dat_obs2 <- sim_dat2[sample(seq_len(nrow(sim_dat2)), 100), ]
-    plot2 <- ggplot(sim_dat2, aes(X, Y)) +
+    sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
+    sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
+    
+    samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 30), ]
+    
+    
+    samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 90), ]
+    
+    
+    # Combine samples
+    sim_dat_obs <- rbind(samples_north,samples_south)
+    
+    plot <- ggplot(sim_dat, aes(X, Y)) +
       geom_raster(aes(fill = eta)) +
-      geom_point(aes(size = observed), data = sim_dat_obs2, pch = 21) +
+      geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
       scale_fill_viridis_c() +
       scale_size_area() +
       coord_cartesian(expand = FALSE)
     
-    return(list("Mid Gradient",plot2))
+    return(list("Mid Gradient",plot, sim_dat_obs))
   } else if (cold_pool_value >= low_range[1] && cold_pool_value <= low_range[2]) {
-    sim_dat3 <- sdmTMB_simulate(
+    sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
       data = predictor_dat,
       mesh = mesh,
@@ -185,19 +205,51 @@ get_operating_model <- function(cold_pool_value) {
       seed = #42
     )
     
-    sim_dat3$eta <- (sim_dat3$eta - min(sim_dat3$eta))
-    sim_dat3$observed <- (sim_dat3$observed - min(sim_dat3$observed))
-    sim_dat_obs3 <- sim_dat3[sample(seq_len(nrow(sim_dat3)), 100), ]
-    plot3 <- ggplot(sim_dat3, aes(X, Y)) +
+    sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
+    sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
+    
+    samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 60), ]
+    
+    
+    samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 60), ]
+    
+    
+    # Combine samples
+    sim_dat_obs <- rbind(samples_north,samples_south)
+    
+    plot <- ggplot(sim_dat, aes(X, Y)) +
       geom_raster(aes(fill = eta)) +
-      geom_point(aes(size = observed), data = sim_dat_obs3, pch = 21) +
+      geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
       scale_fill_viridis_c() +
       scale_size_area() +
       coord_cartesian(expand = FALSE)
-    return(list("Low Operating Model",plot3))
+    return(list("Low Operating Model",plot, sim_dat_obs))
   } else {
     return("No Matching Operating Model")
   }
 }
 
 get_operating_model(sample(ordersimsx$march_sea_ice,1))
+
+
+get_fit <- function(cold_pool_value) {
+  # Call get_operating_model function to get the simulation data and plot
+  result <- get_operating_model(cold_pool_value)
+  
+
+  sim_dat_obs <- result[[3]]
+  
+  mesh <- make_mesh(sim_dat_obs, xy_cols = c("X", "Y"), cutoff = 0.05)
+  
+  fit <- sdmTMB(
+    observed ~ 1,
+    data = sim_dat_obs,
+    mesh = mesh,
+    family = poisson()
+  )
+
+  
+  return(list(plot(mesh), result[[1]], sanity(fit)))
+}
+
+get_fit(sample(ordersimsx$march_sea_ice,1))
