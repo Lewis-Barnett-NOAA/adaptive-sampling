@@ -1,26 +1,31 @@
+library(sdmTMB)
+library(ggplot2)
+
 set.seed(123)
 
 #Sampling units
 n <- 1000
 
-#data frame
+#make data frame including fake "depth" gradient
 predictor_dat <- data.frame(
   expand.grid(X = 1:(n/10), Y = 1:(n/10)),
   depth = rep(rev(seq(1, n/10)), each = n/10)
   #depth = rep(c(1:(n/20), rev(1:(n/20))), n/10) * rev(seq(1, n*10))/max(seq(1, n*10))
 )
 
-predictor_dat
-
-strata <- ifelse(predictor_dat$Y >= 50, 1, 2)
-
 ggplot(predictor_dat, aes(X, Y)) +
   geom_tile(aes(fill = depth)) +
   scale_color_gradient2()
 
-mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", n_knots = 300)
+strata <- ifelse(predictor_dat$Y >= 50, 1, 2) # Define strata
 
+#get triangulated mesh to simulate from
+mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", n_knots = 200)
+plot(mesh)
 
+#define range to use for simulation (higher = smoother)
+ranges <- seq(10, 100, 10) 
+i <- 5 # choosing a specific range value for example (but can do all in a loop)
 
 ## Depth coefficient slope = 0.9 (strong gradient)
 sim_dat <- sdmTMB_simulate(
@@ -35,6 +40,7 @@ sim_dat <- sdmTMB_simulate(
   seed = 42
 )
 
+# Shift values so that minimum abundance is 0 (or fit with a different family)
 sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
 sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
 
@@ -111,6 +117,7 @@ x
 ## Try it out
 order_sims <- simulateX(m,  nsim = 4, X =x)
 ordersimsx <- cbind(order_sims, x)
+ordersimsx[ordersimsx < 0] <- 0 # set negative cold pool extents to 0
 ordersimsx
 
 
@@ -120,12 +127,13 @@ ordersimsx
 cold_pool_value <- sample(ordersimsx$march_sea_ice,1)
 cold_pool_value
 
-# Define the ranges for high, mid, and low cold pool values
+# Define the ranges for high, mid, and low sea ice values
 high_range <- c(0.8, 1)
 mid_range <- c(0.4, 0.8)
 low_range <- c(0, 0.4)
+#TODO: define operating model based on simulated coldpool value range, not ice
 
-# Function to determine the operating model based on cold pool value
+# Function to determine the operating model based on sea ice value
 get_operating_model <- function(cold_pool_value) {
   if (cold_pool_value >= high_range[1] && cold_pool_value <= high_range[2]) {
     sim_dat <- sdmTMB_simulate(
@@ -144,8 +152,6 @@ get_operating_model <- function(cold_pool_value) {
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
    
     samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 20), ]
-    
-    
     samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 100), ]
     
     
@@ -229,27 +235,15 @@ get_operating_model <- function(cold_pool_value) {
   }
 }
 
-get_operating_model(sample(ordersimsx$march_sea_ice,1))
+obs <- get_operating_model(sample(ordersimsx$march_sea_ice,1))
 
 
-get_fit <- function(cold_pool_value) {
-  # Call get_operating_model function to get the simulation data and plot
-  result <- get_operating_model(cold_pool_value)
-  
 
-  sim_dat_obs <- result[[3]]
-  
-  mesh <- make_mesh(sim_dat_obs, xy_cols = c("X", "Y"), cutoff = 0.05)
-  
-  fit <- sdmTMB(
-    observed ~ 1,
-    data = sim_dat_obs,
-    mesh = mesh,
-    family = poisson()
-  )
 
-  
-  return(list(plot(mesh), result[[1]], sanity(fit)))
+
+get_estimate <- function(sea_ice_prop, obs) {
+ 
+  return(list(sea_ice_prop, cold_pool_value, est))
 }
 
-get_fit(sample(ordersimsx$march_sea_ice,1))
+get_estimate(sample(ordersimsx$march_sea_ice,1))
