@@ -10,7 +10,6 @@ n <- 1000
 predictor_dat <- data.frame(
   expand.grid(X = 1:(n/10), Y = 1:(n/10)),
   depth = rep(rev(seq(1, n/10)), each = n/10)
-  #depth = rep(c(1:(n/20), rev(1:(n/20))), n/10) * rev(seq(1, n*10))/max(seq(1, n*10))
 )
 
 ggplot(predictor_dat, aes(X, Y)) +
@@ -118,8 +117,11 @@ ordersimsx <- cbind(order_sims, x)
 ordersimsx[ordersimsx < 0] <- 0 # set negative cold pool extents to 0
 ordersimsx
 
+# Draw a random march sea ice proportion
+ice_value <- sample(ordersimsx$march_sea_ice,1)
+
 # Draw a cold pool extent simulated from a random march sea ice proportion
-cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == sample(ordersimsx$march_sea_ice,1),][sample(1:(ncol(ordersimsx)-1), 1, replace = TRUE)])
+cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,][sample(1:(ncol(ordersimsx)-1), 1, replace = TRUE)])
 cold_pool_value
 
 # Define the ranges for high, mid, and low sea ice values to guide sample allocation
@@ -133,8 +135,6 @@ cp_cat <- quantile(m$model$area_lte2_km2, probs = c(0, .333, .666, 1))
 low_cp <- c(cp_cat[1], cp_cat[2])
 mid_cp <- c(cp_cat[2], cp_cat[3])
 high_cp <- c(cp_cat[3], Inf)
-
-strata <- ifelse(predictor_dat$Y >= 50, 1, 2) # Define strata
 
 # Function to determine the operating model based on sea ice value
 get_operating_model <- function(cold_pool_value) {
@@ -154,20 +154,8 @@ get_operating_model <- function(cold_pool_value) {
     sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
    
-    samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 20), ]
-    samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 100), ]
-    
-    
-    # Combine samples
-    sim_dat_obs <- rbind(samples_north,samples_south)
-   
-     plot1 <- ggplot(sim_dat, aes(X, Y)) +
-      geom_raster(aes(fill = eta)) +
-      geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
-      scale_fill_viridis_c() +
-      scale_size_area() +
-      coord_cartesian(expand = FALSE)
-    return(list("Strong Gradient",plot1, sim_dat_obs))
+    return(sim_dat)
+     
   } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
     sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
@@ -184,21 +172,8 @@ get_operating_model <- function(cold_pool_value) {
     sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
     
-    samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 30), ]
-    samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 90), ]
+    return(sim_dat)
     
-    
-    # Combine samples
-    sim_dat_obs <- rbind(samples_north,samples_south)
-    
-    plot <- ggplot(sim_dat, aes(X, Y)) +
-      geom_raster(aes(fill = eta)) +
-      geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
-      scale_fill_viridis_c() +
-      scale_size_area() +
-      coord_cartesian(expand = FALSE)
-    
-    return(list("Mid Gradient",plot, sim_dat_obs))
   } else if (cold_pool_value >= low_cp[1] && cold_pool_value <= low_cp[2]) {
     sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
@@ -215,34 +190,54 @@ get_operating_model <- function(cold_pool_value) {
     sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
     
-    samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 60), ]
-    samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 60), ]
+    return(sim_dat)
     
-    
-    # Combine samples
-    sim_dat_obs <- rbind(samples_north,samples_south)
-    
-    plot <- ggplot(sim_dat, aes(X, Y)) +
-      geom_raster(aes(fill = eta)) +
-      geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
-      scale_fill_viridis_c() +
-      scale_size_area() +
-      coord_cartesian(expand = FALSE)
-    return(list("Low Operating Model",plot, sim_dat_obs))
   } else {
     return("No Matching Operating Model")
   }
 }
 
-obs <- get_operating_model(sample(ordersimsx$march_sea_ice,1))
+d <- get_operating_model(cold_pool_value)
+d
 
+# Simulate sampling
+abundance <- function(d, ice_value) {
+  
+  d$strata <- ifelse(d$Y >= 50, 1, 2) # Define strata (not evenly split somehow?)
+  
+  if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
+    samples_north <- sample(d[d$strata == 1, "observed"], 20)
+    samples_south <- sample(d[d$strata == 2, "observed"], 100)
 
-
-
-
-get_estimate <- function(sea_ice_prop, obs) {
- 
-  return(list(sea_ice_prop, cold_pool_value, est))
+  } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
+    samples_north <- sample(d[d$strata == 1, "observed"], 40)
+    samples_south <- sample(d[d$strata == 2, "observed"], 80)
+    
+  } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
+    samples_north <- sample(d[d$strata == 1, "observed"], 60)
+    samples_south <- sample(d[d$strata == 2, "observed"], 60)
+  }
+  
+  # estimate abundance
+  est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
+             mean(samples_south) * nrow(d[d$strata == 2,])
+             )
+  
+  # true abundance
+  truth <- sum(d$eta)
+  
+  return(as.data.frame(cbind(ice_value, est, truth)))
 }
 
-get_estimate(sample(ordersimsx$march_sea_ice,1))
+result <- abundance(d, ice_value)
+result
+
+
+# SORRY, I REMOVED THIS PLOT AND HAVEN'T REINTEGRATED IT YET
+# plot <- ggplot(sim_dat, aes(X, Y)) +
+#   geom_raster(aes(fill = eta)) +
+#   geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
+#   #geom_hline(aes(yintercept = 50)) +
+#   scale_fill_viridis_c() +
+#   scale_size_area() +
+#   coord_cartesian(expand = FALSE)
