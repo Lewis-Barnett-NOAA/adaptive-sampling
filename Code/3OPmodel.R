@@ -17,8 +17,6 @@ ggplot(predictor_dat, aes(X, Y)) +
   geom_tile(aes(fill = depth)) +
   scale_color_gradient2()
 
-strata <- ifelse(predictor_dat$Y >= 50, 1, 2) # Define strata
-
 #get triangulated mesh to simulate from
 mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", n_knots = 200)
 plot(mesh)
@@ -120,22 +118,27 @@ ordersimsx <- cbind(order_sims, x)
 ordersimsx[ordersimsx < 0] <- 0 # set negative cold pool extents to 0
 ordersimsx
 
-
-
-
-
-cold_pool_value <- sample(ordersimsx$march_sea_ice,1)
+# Draw a cold pool extent simulated from a random march sea ice proportion
+cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == sample(ordersimsx$march_sea_ice,1),][sample(1:(ncol(ordersimsx)-1), 1, replace = TRUE)])
 cold_pool_value
 
-# Define the ranges for high, mid, and low sea ice values
-high_range <- c(0.8, 1)
-mid_range <- c(0.4, 0.8)
-low_range <- c(0, 0.4)
-#TODO: define operating model based on simulated coldpool value range, not ice
+# Define the ranges for high, mid, and low sea ice values to guide sample allocation
+ice_cat <- quantile(m$model$march_sea_ice, probs = c(0, .5, 1))
+low_ice <- c(0, ice_cat[2])
+mid_ice <- c(ice_cat[2], ice_cat[3])
+high_ice <- c(ice_cat[3], 1)
+
+# Define the ranges for high, mid, and low cold pool extent to determine the operating model
+cp_cat <- quantile(m$model$area_lte2_km2, probs = c(0, .333, .666, 1))
+low_cp <- c(cp_cat[1], cp_cat[2])
+mid_cp <- c(cp_cat[2], cp_cat[3])
+high_cp <- c(cp_cat[3], Inf)
+
+strata <- ifelse(predictor_dat$Y >= 50, 1, 2) # Define strata
 
 # Function to determine the operating model based on sea ice value
 get_operating_model <- function(cold_pool_value) {
-  if (cold_pool_value >= high_range[1] && cold_pool_value <= high_range[2]) {
+  if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
     sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
       data = predictor_dat,
@@ -165,7 +168,7 @@ get_operating_model <- function(cold_pool_value) {
       scale_size_area() +
       coord_cartesian(expand = FALSE)
     return(list("Strong Gradient",plot1, sim_dat_obs))
-  } else if (cold_pool_value >= mid_range[1] && cold_pool_value <= mid_range[2]) {
+  } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
     sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
       data = predictor_dat,
@@ -182,8 +185,6 @@ get_operating_model <- function(cold_pool_value) {
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
     
     samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 30), ]
-    
-    
     samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 90), ]
     
     
@@ -198,7 +199,7 @@ get_operating_model <- function(cold_pool_value) {
       coord_cartesian(expand = FALSE)
     
     return(list("Mid Gradient",plot, sim_dat_obs))
-  } else if (cold_pool_value >= low_range[1] && cold_pool_value <= low_range[2]) {
+  } else if (cold_pool_value >= low_cp[1] && cold_pool_value <= low_cp[2]) {
     sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
       data = predictor_dat,
@@ -215,8 +216,6 @@ get_operating_model <- function(cold_pool_value) {
     sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
     
     samples_north <- sim_dat[strata == 1, ][sample(seq_len(sum(strata == 1)), 60), ]
-    
-    
     samples_south <- sim_dat[strata == 2, ][sample(seq_len(sum(strata == 2)), 60), ]
     
     
