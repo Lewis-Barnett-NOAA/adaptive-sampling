@@ -24,81 +24,81 @@ plot(mesh)
 ranges <- seq(10, 100, 10) 
 i <- 5 # choosing a specific range value for example (but can do all in a loop)
 
-## Depth coefficient slope = 0.9 (strong gradient)
-sim_dat <- sdmTMB_simulate(
-  formula = ~ 1 + depth,
-  data = predictor_dat,
-  mesh = mesh,
-  family = gaussian(link = "identity"),
-  B = c(0.1, 0.9), # B0 = intercept, B1 = depth coefficient slope
-  range = ranges[i],
-  sigma_O = 0.2,
-  phi = 5, # SD of observation error in this (Gaussian) case
-  seed = 42
-)
-
-# Shift values so that minimum abundance is 0 (or fit with a different family)
-sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
-sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
-
-# Plot simulated "true" data
-ggplot(sim_dat, aes(X, Y)) +
-  geom_tile(aes(fill = eta)) +
-  scale_color_gradient2()
-
-
-# Plot simulated "observed" data
-ggplot(sim_dat, aes(X, Y)) +
-  geom_tile(aes(fill = observed)) +
-  scale_color_gradient2()
-
-
-
-#Depth coefficient slope = 0.6 (mid gradient)
-sim_dat2 <- sdmTMB_simulate(
-  formula = ~ 1 + depth,
-  data = predictor_dat,
-  mesh = mesh,
-  family = gaussian(link = "identity"),
-  B = c(0.1, 0.6), # B0 = intercept, B1 = depth coefficient slope
-  range = ranges[i],
-  sigma_O = 0.2,
-  phi = 5, # SD of observation error in this (Gaussian) case
-  seed = 42
-)
-
-sim_dat2$eta <- (sim_dat2$eta - min(sim_dat2$eta))
-sim_dat2$observed <- (sim_dat2$observed - min(sim_dat2$observed))
-
-# Plot simulated "observed" data
-ggplot(sim_dat2, aes(X, Y)) +
-  geom_tile(aes(fill = observed)) +
-  scale_color_gradient2()
-
-
-
-
-##depth coefficient slope = 0.2 (weak gradient)
-sim_dat3 <- sdmTMB_simulate(
-  formula = ~ 1 + depth,
-  data = predictor_dat,
-  mesh = mesh,
-  family = gaussian(link = "identity"),
-  B = c(0.1, 0.2), # B0 = intercept, B1 = depth coefficient slope
-  range = ranges[i],
-  sigma_O = 0.2,
-  phi = 5, # SD of observation error in this (Gaussian) case
-  seed = 42
-)
-
-sim_dat3$eta <- (sim_dat3$eta - min(sim_dat3$eta))
-sim_dat3$observed <- (sim_dat3$observed - min(sim_dat3$observed))
-
-
-# Plot simulated "observed" data
-ggplot(sim_dat3, aes(X, Y)) +
-  geom_tile(aes(fill = observed)) +
-  scale_color_gradient2()
+# ## Depth coefficient slope = 0.9 (strong gradient)
+# sim_dat <- sdmTMB_simulate(
+#   formula = ~ 1 + depth,
+#   data = predictor_dat,
+#   mesh = mesh,
+#   family = gaussian(link = "identity"),
+#   B = c(0.1, 0.9), # B0 = intercept, B1 = depth coefficient slope
+#   range = ranges[i],
+#   sigma_O = 0.2,
+#   phi = 5, # SD of observation error in this (Gaussian) case
+#   seed = 42
+# )
+# 
+# # Shift values so that minimum abundance is 0 (or fit with a different family)
+# sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
+# sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
+# 
+# # Plot simulated "true" data
+# ggplot(sim_dat, aes(X, Y)) +
+#   geom_tile(aes(fill = eta)) +
+#   scale_color_gradient2()
+# 
+# 
+# # Plot simulated "observed" data
+# ggplot(sim_dat, aes(X, Y)) +
+#   geom_tile(aes(fill = observed)) +
+#   scale_color_gradient2()
+# 
+# 
+# 
+# #Depth coefficient slope = 0.6 (mid gradient)
+# sim_dat2 <- sdmTMB_simulate(
+#   formula = ~ 1 + depth,
+#   data = predictor_dat,
+#   mesh = mesh,
+#   family = gaussian(link = "identity"),
+#   B = c(0.1, 0.6), # B0 = intercept, B1 = depth coefficient slope
+#   range = ranges[i],
+#   sigma_O = 0.2,
+#   phi = 5, # SD of observation error in this (Gaussian) case
+#   seed = 42
+# )
+# 
+# sim_dat2$eta <- (sim_dat2$eta - min(sim_dat2$eta))
+# sim_dat2$observed <- (sim_dat2$observed - min(sim_dat2$observed))
+# 
+# # Plot simulated "observed" data
+# ggplot(sim_dat2, aes(X, Y)) +
+#   geom_tile(aes(fill = observed)) +
+#   scale_color_gradient2()
+# 
+# 
+# 
+# 
+# ##depth coefficient slope = 0.2 (weak gradient)
+# sim_dat3 <- sdmTMB_simulate(
+#   formula = ~ 1 + depth,
+#   data = predictor_dat,
+#   mesh = mesh,
+#   family = gaussian(link = "identity"),
+#   B = c(0.1, 0.2), # B0 = intercept, B1 = depth coefficient slope
+#   range = ranges[i],
+#   sigma_O = 0.2,
+#   phi = 5, # SD of observation error in this (Gaussian) case
+#   seed = 42
+# )
+# 
+# sim_dat3$eta <- (sim_dat3$eta - min(sim_dat3$eta))
+# sim_dat3$observed <- (sim_dat3$observed - min(sim_dat3$observed))
+# 
+# 
+# # Plot simulated "observed" data
+# ggplot(sim_dat3, aes(X, Y)) +
+#   geom_tile(aes(fill = observed)) +
+#   scale_color_gradient2()
 
 
 
