@@ -129,7 +129,7 @@ params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
 
 # replicate parameter df once per simulation replicate
-n_rep <- 1000
+n_rep <- 100
 params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 
 # define empty object to house results dataframe
@@ -139,7 +139,7 @@ colnames(results) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "t
 # simulate cold pool extent from random march sea ice values
 m <- readRDS("Data/ice_coldpool_lm.RDS") # load linear fit cold pool:sea ice
 x <- data.frame(march_sea_ice = seq(0, max(m$model$march_sea_ice), by = 0.05))
-order_sims <- simulateX(m,  nsim = 1000, X = x)
+order_sims <- simulateX(m,  nsim = n_rep, X = x)
 ordersimsx <- cbind(order_sims, x)
 ordersimsx[ordersimsx < 0] <- 0 # set negative cold pool extents to 0
 ordersimsx
@@ -189,68 +189,76 @@ for(i in 1:nrow(params)){
 }
 
 results
-saveRDS(results, "results.RDS")
+#saveRDS(results, "results.RDS")
 
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
-results <- readRDS("results.RDS") #load results
-res_range <- results %>% 
-  group_by(range) %>%
-  summarise(bias = mean(estimate-truth),
-            rrmse = sqrt(mean((truth - estimate) ^ 2) / sum(estimate ^ 2)))
+#results <- readRDS("results.RDS") #load results
 
-res_obserr <- results %>% 
-  group_by(phi) %>%
-  summarise(bias = mean(estimate-truth),
-            rrmse = sqrt(mean((truth - estimate) ^ 2) / sum(estimate ^ 2)))
-            
-res_gradient <- results %>% 
-  group_by(B1_low) %>%
-  summarise(bias = mean(estimate-truth),
-            rrmse = sqrt(mean((truth - estimate) ^ 2) / sum(estimate ^ 2)))
-
-p_range_bias <- ggplot(res_range, aes(as.factor(range), bias)) + 
+p_range_bias <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(range), bias)) + 
   geom_boxplot() +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 p_range_bias
 ggsave("Figures/range_bias.pdf")
+  
+p_range_rrmse <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  group_by(range) %>%
+  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  ungroup() %>%
+  ggplot(aes(range, rrmse)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "Spatial Range", y = "RRMSE") +
+  theme_bw()
+p_range_rrmse
+ggsave("Figures/range_rrmse.pdf")
 
-p_obserr_bias <- ggplot(res_obserr, aes(as.factor(phi), bias)) + 
+p_obserr_bias <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(phi), bias)) + 
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 p_obserr_bias
 ggsave("Figures/obserr_bias.pdf")
 
-p_gradient_bias <- ggplot(res_gradient, aes(as.factor(B1_low), bias)) + 
+p_obserr_rrmse <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  group_by(phi) %>%
+  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  ungroup() %>%
+  ggplot(aes(phi, rrmse)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "Observation Error SD", y = "RRMSE") +
+  theme_bw()
+p_range_rrmse
+ggsave("Figures/obserr_rrmse.pdf")           
+
+p_gradient_bias <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(B1_low), bias)) + 
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 p_gradient_bias
 ggsave("Figures/gradient_bias.pdf")
 
-
-p_range_rrmse <- ggplot(res_range, aes(as.factor(range), rrmse)) + 
-  geom_boxplot() +
-  labs(x = "Spatial Range", y = "RRMSE") +
-  theme_bw()
-p_range_rrmse
-ggsave("Figures/range_rrmse.pdf")
-
-p_obserr_rrmse <- ggplot(res_obserr, aes(as.factor(phi), rrmse)) + 
-  geom_boxplot() +
-  labs(x = "Observation Error SD", y = "RRMSE") +
-  theme_bw()
-p_obserr_rrmse
-ggsave("Figures/obserr_rrmse.pdf")
-
-p_gradient_rrmse <- ggplot(res_gradient, aes(as.factor(B1_low), rrmse)) + 
-  geom_boxplot() +
+p_gradient_rrmse <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  group_by(B1_low) %>%
+  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  ungroup() %>%
+  ggplot(aes(B1_low, rrmse)) + 
+  geom_point() +
+  geom_line() +
   labs(x = "True Population Density Gradient", y = "RRMSE") +
   theme_bw()
 p_gradient_rrmse
 ggsave("Figures/gradient_rrmse.pdf")
-
 
 # SORRY, I REMOVED THIS PLOT AND HAVEN'T REINTEGRATED IT YET ----
 # plot <- ggplot(sim_dat, aes(X, Y)) +
