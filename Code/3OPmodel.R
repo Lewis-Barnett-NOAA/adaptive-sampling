@@ -1,5 +1,7 @@
 library(sdmTMB)
 library(ggplot2)
+library(dplyr)
+library(tidyr)
 
 # COLD POOL SIM FUNCTIONS ----
 simulateX <- function(object, nsim = 1, seed = NULL, X, ...) {
@@ -149,6 +151,22 @@ cp_cat <- quantile(m$model$area_lte2_km2, probs = c(0, .333, .666, 1))
 low_cp <- c(cp_cat[1], cp_cat[2])
 mid_cp <- c(cp_cat[2], cp_cat[3])
 high_cp <- c(cp_cat[3], Inf)
+
+# Visualize the simulated data relative to the thresholds for these categories
+vars <- ordersimsx %>% 
+          pivot_longer(
+            cols = starts_with("sim_"),
+            names_to = "sim_id",
+            names_prefix = "sim_",
+            values_to = "coldpool"
+          )
+        
+p_vars <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) + 
+  geom_boxplot() +
+  labs(x = "March Sea Ice Proportion", y = "Cold Pool Area") +
+  theme_bw()
+p_vars
+ggsave("sea_ice_coldpool_sims.pdf")
 
 # Loop over parameter scenarios for the operating model ----
 for(i in 1:nrow(params)){
