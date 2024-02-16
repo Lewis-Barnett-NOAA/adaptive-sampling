@@ -170,7 +170,7 @@ p_vars <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) +
   labs(x = "March Sea Ice Proportion", y = "Cold Pool Area") +
   theme_bw()
 p_vars
-ggsave("sea_ice_coldpool_sims.pdf")
+ggsave("Figures/sea_ice_coldpool_sims.pdf")
 
 # Loop over parameter scenarios for the operating model ----
 for(i in 1:nrow(params)){
@@ -189,8 +189,10 @@ for(i in 1:nrow(params)){
 }
 
 results
+saveRDS(results, "results.RDS")
 
-# compute and plot bias and RRMSE of abundance estimates, grouped by scenario
+# plot bias and RRMSE of abundance estimates, grouped by scenario ----
+results <- readRDS("results.RDS") #load results
 res_range <- results %>% 
   group_by(range) %>%
   summarise(bias = mean(estimate-truth),
@@ -211,21 +213,21 @@ p_range_bias <- ggplot(res_range, aes(as.factor(range), bias)) +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 p_range_bias
-ggsave("range_bias.pdf")
+ggsave("Figures/range_bias.pdf")
 
 p_obserr_bias <- ggplot(res_obserr, aes(as.factor(phi), bias)) + 
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 p_obserr_bias
-ggsave("obserr_bias.pdf")
+ggsave("Figures/obserr_bias.pdf")
 
 p_gradient_bias <- ggplot(res_gradient, aes(as.factor(B1_low), bias)) + 
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 p_gradient_bias
-ggsave("gradient_bias.pdf")
+ggsave("Figures/gradient_bias.pdf")
 
 
 p_range_rrmse <- ggplot(res_range, aes(as.factor(range), rrmse)) + 
@@ -233,21 +235,21 @@ p_range_rrmse <- ggplot(res_range, aes(as.factor(range), rrmse)) +
   labs(x = "Spatial Range", y = "RRMSE") +
   theme_bw()
 p_range_rrmse
-ggsave("range_rrmse.pdf")
+ggsave("Figures/range_rrmse.pdf")
 
 p_obserr_rrmse <- ggplot(res_obserr, aes(as.factor(phi), rrmse)) + 
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "RRMSE") +
   theme_bw()
 p_obserr_rrmse
-ggsave("obserr_rrmse.pdf")
+ggsave("Figures/obserr_rrmse.pdf")
 
 p_gradient_rrmse <- ggplot(res_gradient, aes(as.factor(B1_low), rrmse)) + 
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "RRMSE") +
   theme_bw()
 p_gradient_rrmse
-ggsave("gradient_rrmse.pdf")
+ggsave("Figures/gradient_rrmse.pdf")
 
 
 # SORRY, I REMOVED THIS PLOT AND HAVEN'T REINTEGRATED IT YET ----
