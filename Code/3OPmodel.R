@@ -1,5 +1,7 @@
 library(sdmTMB)
 library(ggplot2)
+library(dplyr)
+library(tidyr)
 
 # COLD POOL SIM FUNCTIONS ----
 simulateX <- function(object, nsim = 1, seed = NULL, X, ...) {
@@ -129,14 +131,18 @@ params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
 
+# replicate parameter df once per simulation replicate
+n_rep <- 100
+params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
+
 # define empty object to house results dataframe
-results <- data.frame(matrix(NA, nrow(params), ncol(params) + 4))
-colnames(results) <- c(colnames(params), "n", "ice_value", "est", "truth")
+results <- data.frame(matrix(NA, nrow(params), ncol(params) + 5))
+colnames(results) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth")
 
 # simulate cold pool extent from random march sea ice values
 m <- readRDS("Data/ice_coldpool_lm.RDS") # load linear fit cold pool:sea ice
 x <- data.frame(march_sea_ice = seq(0, max(m$model$march_sea_ice), by = 0.05))
-order_sims <- simulateX(m,  nsim = 10, X = x)
+order_sims <- simulateX(m,  nsim = n_rep, X = x)
 ordersimsx <- cbind(order_sims, x)
 ordersimsx[ordersimsx < 0] <- 0 # set negative cold pool extents to 0
 ordersimsx
@@ -153,20 +159,109 @@ low_cp <- c(cp_cat[1], cp_cat[2])
 mid_cp <- c(cp_cat[2], cp_cat[3])
 high_cp <- c(cp_cat[3], Inf)
 
+# Visualize the simulated data relative to the thresholds for these categories
+vars <- ordersimsx %>% 
+          pivot_longer(
+            cols = starts_with("sim_"),
+            names_to = "sim_id",
+            names_prefix = "sim_",
+            values_to = "coldpool"
+          )
+        
+p_vars <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) + 
+  geom_boxplot() +
+  labs(x = "March Sea Ice Proportion", y = "Cold Pool Area") +
+  theme_bw()
+p_vars
+ggsave("Figures/sea_ice_coldpool_sims.pdf")
+
 # Loop over parameter scenarios for the operating model ----
 for(i in 1:nrow(params)){
   # Draw a random march sea ice proportion
   ice_value <- sample(ordersimsx$march_sea_ice,1)
   # Draw a cold pool extent simulated from a random march sea ice proportion
-  cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,][sample(1:(ncol(ordersimsx)-1), 1, replace = TRUE)])
+  cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,][sample(1:(ncol(ordersimsx)-1), 1)])
   
   d <- get_operating_model(cold_pool_value, params[i, ])
   
   # Append results to params
-  results[i, ] <- cbind(params[i, ], abundance(d, ice_value, n))
+  results[i, ] <- cbind(params[i, ], 
+                        cold_pool_value, 
+                        abundance(d, ice_value, n)
+                        )
 }
 
 results
+#saveRDS(results, "results.RDS")
+
+# plot bias and RRMSE of abundance estimates, grouped by scenario ----
+#results <- readRDS("results.RDS") #load results
+
+p_range_bias <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(range), bias)) + 
+  geom_boxplot() +
+  labs(x = "Spatial Range", y = "Bias") +
+  theme_bw()
+p_range_bias
+ggsave("Figures/range_bias.pdf")
+  
+p_range_rrmse <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  group_by(range) %>%
+  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  ungroup() %>%
+  ggplot(aes(range, rrmse)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "Spatial Range", y = "RRMSE") +
+  theme_bw()
+p_range_rrmse
+ggsave("Figures/range_rrmse.pdf")
+
+p_obserr_bias <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(phi), bias)) + 
+  geom_boxplot() +
+  labs(x = "Observation Error SD", y = "Bias") +
+  theme_bw()
+p_obserr_bias
+ggsave("Figures/obserr_bias.pdf")
+
+p_obserr_rrmse <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  group_by(phi) %>%
+  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  ungroup() %>%
+  ggplot(aes(phi, rrmse)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "Observation Error SD", y = "RRMSE") +
+  theme_bw()
+p_range_rrmse
+ggsave("Figures/obserr_rrmse.pdf")           
+
+p_gradient_bias <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(B1_low), bias)) + 
+  geom_boxplot() +
+  labs(x = "True Population Density Gradient", y = "Bias") +
+  theme_bw()
+p_gradient_bias
+ggsave("Figures/gradient_bias.pdf")
+
+p_gradient_rrmse <- drop_na(results) %>% 
+  mutate(bias = est - truth) %>%
+  group_by(B1_low) %>%
+  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  ungroup() %>%
+  ggplot(aes(B1_low, rrmse)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "True Population Density Gradient", y = "RRMSE") +
+  theme_bw()
+p_gradient_rrmse
+ggsave("Figures/gradient_rrmse.pdf")
 
 #range and estimate
 ggplot(data = results, aes(x = range, y = est, group = range)) +
