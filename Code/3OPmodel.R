@@ -123,6 +123,9 @@ ranges <- seq(20, 100, 20) # spatial range (higher = smoother, lower = patchier)
 phis <- seq(0.1, 0.5, 0.1) # observation error SD
 B1_lows <- seq(0, 0.3, 0.1) # slope of depth-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
+
+#params <- params[rep(row.names(params), each = 100), ] #clunky way do 100 iterations idk
+
 params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
 
@@ -165,6 +168,78 @@ for(i in 1:nrow(params)){
 
 results
 
+#range and estimate
+ggplot(data = results, aes(x = range, y = est, group = range)) +
+  geom_boxplot()
+
+#range and truth
+ggplot(data = results, aes(x = range, y = truth, group = range)) +
+  geom_boxplot()
+
+
+library(reshape2)
+library(dplyr)
+
+results
+#range
+results_range <- select(results, range, est, truth)
+
+long_results_r <- melt(results_range, id.vars = "range")
+long_results
+
+
+ggplot(long_results_r,aes(range,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge")
+
+#phi
+results_phi <- select(results, phi, est, truth)
+
+long_results_p <- melt(results_phi, id.vars = "phi")
+long_results
+
+
+ggplot(long_results_p,aes(phi,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge")
+
+#b1_low
+results_bl <- select(results, B1_low, est, truth)
+
+long_results_bl <- melt(results_bl, id.vars = "B1_low")
+long_results
+
+
+ggplot(long_results_bl,aes(B1_low,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge")
+
+#b1_mid
+results_bm <- select(results, B1_mid, est, truth)
+
+long_results_bm <- melt(results_bm, id.vars = "B1_mid")
+long_results
+
+
+ggplot(long_results_bm,aes(B1_mid,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge")
+
+#b1_high
+results_bh <- select(results, B1_high, est, truth)
+
+long_results_bh <- melt(results_bh, id.vars = "B1_high")
+long_results
+
+
+ggplot(long_results_bh,aes(B1_high,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge")
+
+#ice_value #this is not an explanatory variable in this example I dont think
+results_ice <- select(results, ice_value, est, truth)
+
+long_results_ice <- melt(results_ice, id.vars = "ice_value")
+long_results
+
+
+ggplot(long_results_ice,aes(ice_value,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge")
 # SORRY, I REMOVED THIS PLOT AND HAVEN'T REINTEGRATED IT YET ----
 # plot <- ggplot(sim_dat, aes(X, Y)) +
 #   geom_raster(aes(fill = eta)) +
