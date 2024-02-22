@@ -238,7 +238,7 @@ p_obserr_rrmse <- drop_na(results) %>%
   geom_line() +
   labs(x = "Observation Error SD", y = "RRMSE") +
   theme_bw()
-p_range_rrmse
+p_obserr_rrmse
 ggsave("Figures/obserr_rrmse.pdf")           
 
 p_gradient_bias <- drop_na(results) %>% 
@@ -261,7 +261,7 @@ p_gradient_rrmse <- drop_na(results) %>%
   labs(x = "True Population Density Gradient", y = "RRMSE") +
   theme_bw()
 p_gradient_rrmse
-ggsave("Figures/gradient_rrmse.pdf")
+wggsave("Figures/gradient_rrmse.pdf")
 
 #range and estimate
 ggplot(data = results, aes(x = range, y = est, group = range)) +
