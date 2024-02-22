@@ -204,7 +204,7 @@ p_range_bias <- drop_na(results) %>%
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 p_range_bias
-ggsave("Figures/range_bias.pdf")
+ggsave("Figures/SimFigs/range_bias.pdf")
   
 p_range_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
@@ -217,7 +217,7 @@ p_range_rrmse <- drop_na(results) %>%
   labs(x = "Spatial Range", y = "RRMSE") +
   theme_bw()
 p_range_rrmse
-ggsave("Figures/range_rrmse.pdf")
+ggsave("Figures/SimFigs/range_rrmse.pdf")
 
 p_obserr_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
@@ -226,7 +226,7 @@ p_obserr_bias <- drop_na(results) %>%
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 p_obserr_bias
-ggsave("Figures/obserr_bias.pdf")
+ggsave("Figures/SimFigs/obserr_bias.pdf")
 
 p_obserr_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
@@ -239,7 +239,7 @@ p_obserr_rrmse <- drop_na(results) %>%
   labs(x = "Observation Error SD", y = "RRMSE") +
   theme_bw()
 p_obserr_rrmse
-ggsave("Figures/obserr_rrmse.pdf")           
+ggsave("Figures/SimFigs/obserr_rrmse.pdf")           
 
 p_gradient_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
@@ -248,7 +248,7 @@ p_gradient_bias <- drop_na(results) %>%
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 p_gradient_bias
-ggsave("Figures/gradient_bias.pdf")
+ggsave("Figures/SimFigs/gradient_bias.pdf")
 
 p_gradient_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
@@ -261,7 +261,7 @@ p_gradient_rrmse <- drop_na(results) %>%
   labs(x = "True Population Density Gradient", y = "RRMSE") +
   theme_bw()
 p_gradient_rrmse
-wggsave("Figures/gradient_rrmse.pdf")
+ggsave("Figures/SimFigs/gradient_rrmse.pdf")
 
 #range and estimate
 ggplot(data = results, aes(x = range, y = est, group = range)) +
@@ -285,6 +285,8 @@ long_results
 
 ggplot(long_results_r,aes(range,value,fill=variable))+
   geom_bar(stat="identity",position="dodge")
+ggsave("Figures/SimFigs/rangecomp.pdf")
+
 
 #phi
 results_phi <- select(results, phi, est, truth)
