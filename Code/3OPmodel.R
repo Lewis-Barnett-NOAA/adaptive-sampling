@@ -215,12 +215,12 @@ ggsave("Figures/SimFigs/range_bias.pdf")
 p_range_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
   group_by(range) %>%
-  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
   ggplot(aes(range, rrmse)) + 
   geom_point() +
   geom_line() +
-  labs(x = "Spatial Range", y = "RRMSE") +
+  labs(x = "Spatial Range", y = "RRMSE %") +
   theme_bw()
 p_range_rrmse
 ggsave("Figures/SimFigs/range_rrmse.pdf")
@@ -237,12 +237,12 @@ ggsave("Figures/SimFigs/obserr_bias.pdf")
 p_obserr_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
   group_by(phi) %>%
-  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
   ggplot(aes(phi, rrmse)) + 
   geom_point() +
   geom_line() +
-  labs(x = "Observation Error SD", y = "RRMSE") +
+  labs(x = "Observation Error SD", y = "RRMSE %") +
   theme_bw()
 p_obserr_rrmse
 ggsave("Figures/SimFigs/obserr_rrmse.pdf")           
@@ -259,12 +259,12 @@ ggsave("Figures/SimFigs/gradient_bias.pdf")
 p_gradient_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
   group_by(B1_low) %>%
-  summarise(rrmse = sqrt(mean((truth - est) ^ 2) / sum(est ^ 2))) %>%
+  summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
   ggplot(aes(B1_low, rrmse)) + 
   geom_point() +
   geom_line() +
-  labs(x = "True Population Density Gradient", y = "RRMSE") +
+  labs(x = "True Population Density Gradient", y = "RRMSE %") +
   theme_bw()
 p_gradient_rrmse
 ggsave("Figures/SimFigs/gradient_rrmse.pdf")
