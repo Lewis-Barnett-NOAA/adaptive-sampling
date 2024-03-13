@@ -149,12 +149,14 @@ ordersimsx
 
 # Define the ranges for high, mid, and low sea ice values to guide sample allocation
 ice_cat <- quantile(m$model$march_sea_ice, probs = c(0, .5, 1))
+ice_cat
 low_ice <- c(0, ice_cat[2])
 mid_ice <- c(ice_cat[2], ice_cat[3])
 high_ice <- c(ice_cat[3], 1)
 
 # Define the ranges for high, mid, and low cold pool extent to determine the operating model
 cp_cat <- quantile(m$model$area_lte2_km2, probs = c(0, .333, .666, 1))
+cp_cat
 low_cp <- c(cp_cat[1], cp_cat[2])
 mid_cp <- c(cp_cat[2], cp_cat[3])
 high_cp <- c(cp_cat[3], Inf)
@@ -173,7 +175,7 @@ p_vars <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) +
   labs(x = "March Sea Ice Proportion", y = "Cold Pool Area") +
   theme_bw()
 p_vars
-ggsave("Figures/sea_ice_coldpool_sims.pdf")
+ggsave("Figures/SimFigs/sea_ice_coldpool_sims.pdf")
 
 # Loop over parameter scenarios for the operating model ----
 for(i in 1:nrow(params)){
@@ -194,6 +196,10 @@ for(i in 1:nrow(params)){
 results
 #saveRDS(results, "results.RDS")
 
+results_bias <- mutate(results, bias = est-truth)
+results_bias
+
+range(results_bias$bias)
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
 #results <- readRDS("results.RDS") #load results
 
@@ -337,15 +343,107 @@ long_results
 
 ggplot(long_results_ice,aes(ice_value,value,fill=variable))+
   geom_bar(stat="identity",position="dodge")
-# SORRY, I REMOVED THIS PLOT AND HAVEN'T REINTEGRATED IT YET ----
-# plot <- ggplot(sim_dat, aes(X, Y)) +
-#   geom_raster(aes(fill = eta)) +
-#   geom_point(aes(size = observed), data = sim_dat_obs, pch = 21) +
-#   #geom_hline(aes(yintercept = 50)) +
-#   scale_fill_viridis_c() +
-#   scale_size_area() +
-#   coord_cartesian(expand = FALSE)
 
+####
+sampling <- function(d, ice_value, n) {
+  # Define strata based on Y values
+  d$strata <- ifelse(d$Y >= 50, 1, 2)
+  
+  # Define sampling proportions based on ice_value
+  if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
+    prop_north <- 0.1
+    prop_south <- 0.9
+  } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
+    prop_north <- 0.25
+    prop_south <- 0.75
+  } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
+    prop_north <- 0.5
+    prop_south <- 0.5
+  }
+  
+  # Sample row indices for north and south strata
+  indices_north <- sample(which(d$strata == 1), floor(n * prop_north))
+  indices_south <- sample(which(d$strata == 2), floor(n * prop_south))
+  
+  # Extract sampled rows from the data frame
+  samples_north <- d[indices_north, ]
+  samples_south <- d[indices_south, ]
+  
+  # Add a region column to each data frame
+  samples_north$region <- "north"
+  samples_south$region <- "south"
+  
+  # Combine the data frames into a single data frame
+  combined_samples <- dplyr::bind_rows(samples_north, samples_south)
+  
+  return(combined_samples)
+}
+
+
+params  
+
+#ice values
+0.08 #low
+0.41 #mid
+0.65 #high
+
+#cold pool values
+6150 #low
+200000 #mid
+300000 #high
+#representative range values
+params[16,]
+op_low <- get_operating_model(100000, params[16,])
+sim_dat <- sampling(op_low,0.5,100)
+
+range20 <- ggplot(op_low, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+ggsave("range20_plot.png", range20)
+
+params[20,]
+op_low <- get_operating_model(100000, params[20,])
+sim_dat <- sampling(op_low,0.5,100)
+
+range100 <- ggplot(op_low, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+ggsave("range100_plot.png", range100)
+
+#representative density values
+params[13,]
+op_low <- get_operating_model(100000, params[13,])
+sim_dat <- sampling(op_low,0.5,100)
+
+wk_grad <- ggplot(op_low, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+ggsave("wk_grad_plot.png", wk_grad)
+
+params[88,]
+op_low <- get_operating_model(100000, params[88,])
+sim_dat <- sampling(op_low,0.5,100)
+
+strng_grad <- ggplot(op_low, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+ggsave("strng_grad_plot.png", strng_grad)
 
 # OLD EXPERIMENTAL CODE
 # ## Depth coefficient slope = 0.9 (strong gradient)
