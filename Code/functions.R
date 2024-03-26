@@ -67,7 +67,7 @@ abundance <- function(d, ice_value, n, adaptive) {
   
   d$strata <- ifelse(d$Y >= 50, 1, 2) # TODO: redefine strata (not evenly split somehow?)
   
-  if(adaptive == TRUE) {
+  if(adaptive == 1) {
        if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
       samples_north <- sample(d[d$strata == 1, "observed"], n*0.1)
       samples_south <- sample(d[d$strata == 2, "observed"], n*0.9)
@@ -80,22 +80,25 @@ abundance <- function(d, ice_value, n, adaptive) {
       samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
       samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
     }
+    # estimate abundance
+    est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
+               mean(samples_south) * nrow(d[d$strata == 2,])
+    )
   }
  
-  if(adaptive == FALSE){
+  if(adaptive == 0){
     samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
     samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
+    est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
+               mean(samples_south) * nrow(d[d$strata == 2,])
+    )
   }
   
-  if(is.null(adaptive)){
+  if(adaptive == -1){
     samples_north <- sample(d[d$strata == 1, "observed"], 0)
     samples_south <- sample(d[d$strata == 2, "observed"], n)
+    est <- mean(samples_south) * nrow(d)
   }
-  
-  # estimate abundance
-  est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
-             mean(samples_south) * nrow(d[d$strata == 2,])
-  )
   
   # true abundance
   truth <- sum(d$eta)

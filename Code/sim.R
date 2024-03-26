@@ -45,7 +45,7 @@ params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 # define empty object to house results dataframe
 results_adapt <- data.frame(matrix(NA, nrow(params), ncol(params) + 6))
 colnames(results_adapt) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth", "adaptive")
-results_noadapt <- results_null <- results_adapt
+results_noadapt <- results_sonly <- results_adapt
 
 
 # simulate cold pool extent from random march sea ice values
@@ -98,19 +98,19 @@ for(i in 1:nrow(params)){
   # Append results to params
   results_adapt[i, ] <- cbind(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, adaptive = TRUE)
+                              abundance(d, ice_value, n, adaptive = 1)
                               )
   results_noadapt[i, ] <- cbind(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, adaptive = FALSE)
+                              abundance(d, ice_value, n, adaptive = 0)
                              )
-  results_null[i, ] <- cbind(params[i, ], 
+  results_sonly[i, ] <- cbind(params[i, ], 
                              cold_pool_value, 
-                             abundance(d, ice_value, n, adaptive = NULL)
+                             abundance(d, ice_value, n, adaptive = -1)
   )
 }
 
-results <- rbind(results_adapt, results_null, results_noadapt)
+results <- rbind(results_adapt, results_sonly, results_noadapt)
 #saveRDS(results, "results.RDS")
 
 
