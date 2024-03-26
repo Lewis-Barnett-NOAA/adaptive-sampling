@@ -65,7 +65,7 @@ get_operating_model <- function(cold_pool_value, params) {
 # Simulate sampling
 abundance <- function(d, ice_value, n, adaptive) {
   
-  d$strata <- ifelse(d$Y >= 50, 1, 2) # TODO: redefine strata (not evenly split somehow?)
+  d$strata <- ifelse(d$Y > 50, 1, 2)
   
   if(adaptive == 1) {
        if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
@@ -95,6 +95,11 @@ abundance <- function(d, ice_value, n, adaptive) {
   }
   
   if(adaptive == -1){
+    samples <- sample(d[, "observed"], n)
+    est <- mean(samples) * nrow(d)
+  }
+  
+  if(adaptive == -2){
     samples_north <- sample(d[d$strata == 1, "observed"], 0)
     samples_south <- sample(d[d$strata == 2, "observed"], n)
     est <- mean(samples_south) * nrow(d)
