@@ -63,11 +63,11 @@ get_operating_model <- function(cold_pool_value, params) {
 }
 
 # Simulate sampling
-abundance <- function(d, ice_value, n, adaptive) {
+abundance <- function(d, ice_value, n, design) {
   
   d$strata <- ifelse(d$Y > 50, 1, 2)
   
-  if(adaptive == 1) {
+  if(design == "adaptive stratified") {
        if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
       samples_north <- sample(d[d$strata == 1, "observed"], n*0.1)
       samples_south <- sample(d[d$strata == 2, "observed"], n*0.9)
@@ -86,7 +86,7 @@ abundance <- function(d, ice_value, n, adaptive) {
     )
   }
  
-  if(adaptive == 0){
+  if(design == "proportional stratified") {
     samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
     samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
     est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
@@ -94,12 +94,12 @@ abundance <- function(d, ice_value, n, adaptive) {
     )
   }
   
-  if(adaptive == -1){
+  if(design == "simple random") {
     samples <- sample(d[, "observed"], n)
     est <- mean(samples) * nrow(d)
   }
   
-  if(adaptive == -2){
+  if(design == "south stratum only") {
     samples_north <- sample(d[d$strata == 1, "observed"], 0)
     samples_south <- sample(d[d$strata == 2, "observed"], n)
     est <- mean(samples_south) * nrow(d)

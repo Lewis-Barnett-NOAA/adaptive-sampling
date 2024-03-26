@@ -98,19 +98,23 @@ for(i in 1:nrow(params)){
   # Append results to params
   results_adapt[i, ] <- cbind(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, adaptive = 1)
+                              abundance(d, ice_value, n, design = "adaptive stratified")
                               )
   results_noadapt[i, ] <- cbind(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, adaptive = 0)
+                              abundance(d, ice_value, n, design = "proportional stratified")
                              )
+  results_srs[i, ] <- cbind(params[i, ], 
+                              cold_pool_value, 
+                              abundance(d, ice_value, n, design = "simple random")
+                            )
   results_sonly[i, ] <- cbind(params[i, ], 
                              cold_pool_value, 
-                             abundance(d, ice_value, n, adaptive = -1)
+                             abundance(d, ice_value, n, design = "south stratum only")
   )
 }
 
-results <- rbind(results_adapt, results_sonly, results_noadapt)
+results <- rbind(results_adapt, results_sonly, results_noadapt, results_srs)
 #saveRDS(results, "results.RDS")
 
 
