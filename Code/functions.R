@@ -109,7 +109,7 @@ abundance <- function(d, ice_value, n, adaptive) {
 # simulate observations for plotting
 sampling <- function(d, ice_value, n) {
   # Define strata based on Y values
-  d$strata <- ifelse(d$Y >= 50, 1, 2)
+  d$strata <- ifelse(d$Y > 50, 1, 2)
   
   # Define sampling proportions based on ice_value
   if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
