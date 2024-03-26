@@ -45,7 +45,8 @@ params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 # define empty object to house results dataframe
 results_adapt <- data.frame(matrix(NA, nrow(params), ncol(params) + 6))
 colnames(results_adapt) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth", "adaptive")
-results_null <- results_adapt
+results_noadapt <- results_null <- results_adapt
+
 
 # simulate cold pool extent from random march sea ice values
 m <- readRDS("Data/ice_coldpool_lm.RDS") # load linear fit cold pool:sea ice
@@ -99,13 +100,17 @@ for(i in 1:nrow(params)){
                               cold_pool_value, 
                               abundance(d, ice_value, n, adaptive = TRUE)
                               )
-  results_null[i, ] <- cbind(params[i, ], 
+  results_noadapt[i, ] <- cbind(params[i, ], 
                               cold_pool_value, 
                               abundance(d, ice_value, n, adaptive = FALSE)
                              )
+  results_null[i, ] <- cbind(params[i, ], 
+                             cold_pool_value, 
+                             abundance(d, ice_value, n, adaptive = NULL)
+  )
 }
 
-results <- rbind(results_adapt, results_null)
+results <- rbind(results_adapt, results_null, results_noadapt)
 #saveRDS(results, "results.RDS")
 
 
@@ -115,7 +120,7 @@ results <- rbind(results_adapt, results_null)
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
 p_range_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  ggplot(aes(as.factor(range), bias, color = adaptive)) + 
+  ggplot(aes(as.factor(range), bias)) + 
   geom_boxplot() +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
@@ -124,10 +129,10 @@ ggsave("Figures/SimFigs/range_bias.pdf")
 
 p_range_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  group_by(range) %>%
+  group_by(range, adaptive) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
-  ggplot(aes(range, rrmse, color = adaptive)) + 
+  ggplot(aes(range, rrmse, group = adaptive, color = adaptive)) + 
   geom_point() +
   geom_line() +
   labs(x = "Spatial Range", y = "RRMSE %") +
@@ -137,7 +142,7 @@ ggsave("Figures/SimFigs/range_rrmse.pdf")
 
 p_obserr_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  ggplot(aes(as.factor(phi), bias, color = adaptive)) + 
+  ggplot(aes(as.factor(phi), bias)) + 
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
@@ -146,10 +151,10 @@ ggsave("Figures/SimFigs/obserr_bias.pdf")
 
 p_obserr_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  group_by(phi) %>%
+  group_by(phi, adaptive) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
-  ggplot(aes(phi, rrmse, color = adaptive)) + 
+  ggplot(aes(phi, rrmse, group = adaptive, color = adaptive)) + 
   geom_point() +
   geom_line() +
   labs(x = "Observation Error SD", y = "RRMSE %") +
@@ -159,7 +164,7 @@ ggsave("Figures/SimFigs/obserr_rrmse.pdf")
 
 p_gradient_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  ggplot(aes(as.factor(B1_low), bias, color = adaptive)) + 
+  ggplot(aes(as.factor(B1_low), bias)) + 
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
@@ -168,10 +173,10 @@ ggsave("Figures/SimFigs/gradient_bias.pdf")
 
 p_gradient_rrmse <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  group_by(B1_low) %>%
+  group_by(B1_low, adaptive) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
-  ggplot(aes(B1_low, rrmse, color = adaptive)) + 
+  ggplot(aes(B1_low, rrmse, group = adaptive, color = adaptive)) + 
   geom_point() +
   geom_line() +
   labs(x = "True Population Density Gradient", y = "RRMSE %") +

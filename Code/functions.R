@@ -87,6 +87,11 @@ abundance <- function(d, ice_value, n, adaptive) {
     samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
   }
   
+  if(is.null(adaptive)){
+    samples_north <- sample(d[d$strata == 1, "observed"], 0)
+    samples_south <- sample(d[d$strata == 2, "observed"], n)
+  }
+  
   # estimate abundance
   est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
              mean(samples_south) * nrow(d[d$strata == 2,])
