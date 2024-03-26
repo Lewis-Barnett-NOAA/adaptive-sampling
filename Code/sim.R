@@ -124,7 +124,7 @@ results <- rbind(results_adapt, results_sonly, results_noadapt, results_srs)
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
 p_range_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  ggplot(aes(as.factor(range), bias)) + 
+  ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
   geom_boxplot() +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
@@ -146,7 +146,7 @@ ggsave("Figures/SimFigs/range_rrmse.pdf")
 
 p_obserr_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  ggplot(aes(as.factor(phi), bias)) + 
+  ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
@@ -168,7 +168,7 @@ ggsave("Figures/SimFigs/obserr_rrmse.pdf")
 
 p_gradient_bias <- drop_na(results) %>% 
   mutate(bias = est - truth) %>%
-  ggplot(aes(as.factor(B1_low), bias)) + 
+  ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
