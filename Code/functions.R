@@ -63,7 +63,10 @@ get_operating_model <- function(cold_pool_value, params) {
 }
 
 # Simulate sampling
-abundance <- function(d, ice_value, n, design) {
+abundance <- function(d, ice_value, n, design = c(
+  "adaptive stratified","proportional stratified",
+  "simple random", "south stratum only"
+)) {
   
   d$strata <- ifelse(d$Y > 50, 1, 2)
   
@@ -108,7 +111,7 @@ abundance <- function(d, ice_value, n, design) {
   # true abundance
   truth <- sum(d$eta)
   
-  return(as.data.frame(cbind(n, ice_value, est, truth, adaptive)))
+  return(as.data.frame(cbind(n, ice_value, est, truth, design)))
 }
 
 # simulate observations for plotting
