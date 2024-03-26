@@ -43,8 +43,8 @@ n_rep <- 100
 params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 
 # define empty object to house results dataframe
-results <- data.frame(matrix(NA, nrow(params), ncol(params) + 5))
-colnames(results) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth")
+results <- data.frame(matrix(NA, nrow(params*2), ncol(params) + 6))
+colnames(results) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth", "adaptive")
 
 # simulate cold pool extent from random march sea ice values
 m <- readRDS("Data/ice_coldpool_lm.RDS") # load linear fit cold pool:sea ice
@@ -93,11 +93,16 @@ for(i in 1:nrow(params)){
   
   d <- get_operating_model(cold_pool_value, params[i, ])
   
+  est <- rbind(abundance(d, ice_value, n, adaptive = TRUE),
+               abundance(d, ice_value, n, adaptive = FALSE)
+  )
+  
   # Append results to params
   results[i, ] <- cbind(params[i, ], 
                         cold_pool_value, 
-                        abundance(d, ice_value, n)
+                        est
                         )
+  results[i, ] 
 }
 
 results

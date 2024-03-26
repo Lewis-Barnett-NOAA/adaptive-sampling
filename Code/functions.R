@@ -63,19 +63,26 @@ get_operating_model <- function(cold_pool_value, params) {
 }
 
 # Simulate sampling
-abundance <- function(d, ice_value, n) {
+abundance <- function(d, ice_value, n, adaptive) {
   
   d$strata <- ifelse(d$Y >= 50, 1, 2) # TODO: redefine strata (not evenly split somehow?)
   
-  if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
-    samples_north <- sample(d[d$strata == 1, "observed"], n*0.1)
-    samples_south <- sample(d[d$strata == 2, "observed"], n*0.9)
-    
-  } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
-    samples_north <- sample(d[d$strata == 1, "observed"], n*0.25)
-    samples_south <- sample(d[d$strata == 2, "observed"], n*0.75)
-    
-  } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
+  if(adaptive = TRUE) {
+       if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.1)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.9)
+      
+    } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.25)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.75)
+      
+    } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
+    }
+  }
+ 
+  if(adaptive = FALSE){
     samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
     samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
   }
@@ -88,7 +95,7 @@ abundance <- function(d, ice_value, n) {
   # true abundance
   truth <- sum(d$eta)
   
-  return(as.data.frame(cbind(n, ice_value, est, truth)))
+  return(as.data.frame(cbind(n, ice_value, est, truth, adaptive)))
 }
 
 # simulate observations for plotting
