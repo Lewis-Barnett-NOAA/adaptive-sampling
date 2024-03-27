@@ -79,13 +79,6 @@ vars <- ordersimsx %>%
             names_prefix = "sim_",
             values_to = "coldpool"
           )
-        
-p_vars <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) + 
-  geom_boxplot() +
-  labs(x = "March Sea Ice Proportion", y = "Cold Pool Area") +
-  theme_bw()
-p_vars
-ggsave("Figures/SimFigs/sea_ice_coldpool_sims.pdf")
 
 # Loop over parameter scenarios for the operating model ----
 for(i in 1:nrow(params)){
@@ -120,7 +113,15 @@ results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs)
 
 
 # Plots for cold pool sea ice simulations -----
+
 #results <- readRDS("results.RDS") #load results
+
+p_ice <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) + 
+  geom_boxplot() +
+  labs(x = "March Sea Ice Proportion", y = "Cold Pool Area") +
+  theme_bw()
+p_ice
+ggsave("Figures/SimFigs/sea_ice_coldpool_sims.pdf")
 
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
 p_range_bias <- drop_na(results) %>% 
