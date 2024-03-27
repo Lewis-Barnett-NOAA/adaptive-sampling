@@ -5,6 +5,7 @@ library(dplyr)
 library(tidyr)
 library(reshape2)
 
+# General simulation settings ----
 set.seed(123)
 
 # Sample size
@@ -96,25 +97,25 @@ for(i in 1:nrow(params)){
   d <- get_operating_model(cold_pool_value, params[i, ])
   
   # Append results to params
-  results_adapt[i, ] <- cbind(params[i, ], 
+  results_adapt[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
                               abundance(d, ice_value, n, design = "adaptive stratified")
                               )
-  results_noadapt[i, ] <- cbind(params[i, ], 
+  results_noadapt[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
                               abundance(d, ice_value, n, design = "proportional stratified")
                              )
-  results_srs[i, ] <- cbind(params[i, ], 
+  results_srs[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
                               abundance(d, ice_value, n, design = "simple random")
                             )
-  results_sonly[i, ] <- cbind(params[i, ], 
+  results_sonly[i, ] <- bind_cols(params[i, ], 
                              cold_pool_value, 
                              abundance(d, ice_value, n, design = "south stratum only")
   )
 }
 
-results <- rbind(results_adapt, results_sonly, results_noadapt, results_srs)
+results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs)
 #saveRDS(results, "results.RDS")
 
 

@@ -111,7 +111,7 @@ abundance <- function(d, ice_value, n, design = c(
   # true abundance
   truth <- sum(d$eta)
   
-  return(as.data.frame(cbind(n, ice_value, est, truth, design)))
+  return(as.data.frame(bind_cols(n, ice_value, est, truth, design)))
 }
 
 # simulate observations for plotting
