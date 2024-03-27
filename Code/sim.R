@@ -20,13 +20,9 @@ predictor_dat <- data.frame(
   depth = rep(rev(seq(1, N/10)), each = N/10)
 )
 
-ggplot(predictor_dat, aes(X, Y)) +
-  geom_tile(aes(fill = depth)) +
-  scale_color_gradient2()
-
 #get triangulated mesh to simulate from
 mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", n_knots = 200)
-plot(mesh)
+#plot(mesh)
 
 #define parameters to loop over in operating models
 ranges <- seq(20, 100, 20) # spatial range (higher = smoother, lower = patchier)
@@ -115,6 +111,13 @@ results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs)
 # Plots for cold pool sea ice simulations -----
 
 #results <- readRDS("results.RDS") #load results
+p_gradient <-
+  ggplot(predictor_dat, aes(X, Y)) +
+    geom_tile(aes(fill = depth)) +
+    scale_color_gradient2()
+theme_bw()
+p_gradient
+ggsave("Figures/SimFigs/gradient_fake_covar.pdf")
 
 p_ice <- ggplot(vars, aes(as.factor(march_sea_ice), coldpool)) + 
   geom_boxplot() +
