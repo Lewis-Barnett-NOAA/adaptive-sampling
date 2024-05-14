@@ -65,7 +65,7 @@ get_operating_model <- function(cold_pool_value, params) {
 # Simulate sampling
 abundance <- function(d, ice_value, n, design = c(
   "adaptive stratified","proportional stratified",
-  "simple random", "south stratum only"
+  "simple random", "south stratum only", "south stratum extrapolated"
 )) {
   
   d$strata <- ifelse(d$Y > 50, 1, 2)
@@ -102,10 +102,16 @@ abundance <- function(d, ice_value, n, design = c(
     est <- mean(samples) * nrow(d)
   }
   
-  if(design == "south stratum only") {
+  if(design == "south stratum extrapolated") {
     samples_north <- sample(d[d$strata == 1, "observed"], 0)
     samples_south <- sample(d[d$strata == 2, "observed"], n)
     est <- mean(samples_south) * nrow(d)
+  }
+  
+  if(design == "south stratum only") {
+    samples_north <- sample(d[d$strata == 1, "observed"], 0)
+    samples_south <- sample(d[d$strata == 2, "observed"], n)
+    est <- mean(samples_south) * nrow(d[d$strata == 2,])
   }
   
   # true abundance
