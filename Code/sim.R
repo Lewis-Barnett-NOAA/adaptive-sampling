@@ -4,6 +4,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(reshape2)
+library(cowplot)
 
 # General simulation settings ----
 set.seed(123)
@@ -135,16 +136,28 @@ p_ice
 ggsave("Figures/SimFigs/sea_ice_coldpool_sims.pdf")
 
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
-p_range_bias <- drop_na(results) %>% 
+# separate panels for the south only scenarios
+res <- drop_na(results) %>% 
+  filter(!design %in% c("south stratum only", "south stratum extrapolated"))
+res_s <- drop_na(results) %>% 
+  filter(design %in% c("south stratum only", "south stratum extrapolated"))
+
+p_range_bias <- res %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
   geom_boxplot() +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
-p_range_bias
+p_range_bias_s <- res_s %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
+  geom_boxplot() +
+  labs(x = "Spatial Range", y = "Bias") +
+  theme_bw()
+plot_grid(p_range_bias, p_range_bias_s, labels = "AUTO")
 ggsave("Figures/SimFigs/range_bias.pdf")
 
-p_range_rrmse <- drop_na(results) %>% 
+p_range_rrmse <- res %>% 
   mutate(bias = est - truth) %>%
   group_by(range, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
@@ -154,19 +167,35 @@ p_range_rrmse <- drop_na(results) %>%
   geom_line() +
   labs(x = "Spatial Range", y = "RRMSE %") +
   theme_bw()
-p_range_rrmse
+p_range_rrmse_s <- res_s %>% 
+  mutate(bias = est - truth) %>%
+  group_by(range, design) %>%
+  summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
+  ungroup() %>%
+  ggplot(aes(range, rrmse, group = design, color = design)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "Spatial Range", y = "RRMSE %") +
+  theme_bw()
+plot_grid(p_range_rrmse, p_range_rrmse_s, labels = "AUTO")
 ggsave("Figures/SimFigs/range_rrmse.pdf")
 
-p_obserr_bias <- drop_na(results) %>% 
+p_obserr_bias <- res %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
-p_obserr_bias
+p_obserr_bias_s <- res_s %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
+  geom_boxplot() +
+  labs(x = "Observation Error SD", y = "Bias") +
+  theme_bw()
+plot_grid(p_obserr_bias, p_obserr_bias_s, labels = "AUTO")
 ggsave("Figures/SimFigs/obserr_bias.pdf")
 
-p_obserr_rrmse <- drop_na(results) %>% 
+p_obserr_rrmse <- res %>% 
   mutate(bias = est - truth) %>%
   group_by(phi, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
@@ -176,19 +205,35 @@ p_obserr_rrmse <- drop_na(results) %>%
   geom_line() +
   labs(x = "Observation Error SD", y = "RRMSE %") +
   theme_bw()
-p_obserr_rrmse
+p_obserr_rrmse_s <- res_s %>% 
+  mutate(bias = est - truth) %>%
+  group_by(phi, design) %>%
+  summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
+  ungroup() %>%
+  ggplot(aes(phi, rrmse, group = design, color = design)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "Observation Error SD", y = "RRMSE %") +
+  theme_bw()
+plot_grid(p_obserr_rrmse, p_obserr_rrmse_s, labels = "AUTO")
 ggsave("Figures/SimFigs/obserr_rrmse.pdf")           
 
-p_gradient_bias <- drop_na(results) %>% 
+p_gradient_bias <- res %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
-p_gradient_bias
+p_gradient_bias_s <- res_s %>% 
+  mutate(bias = est - truth) %>%
+  ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
+  geom_boxplot() +
+  labs(x = "True Population Density Gradient", y = "Bias") +
+  theme_bw()
+plot_grid(p_gradient_bias, p_gradient_bias_s, labels = "AUTO")
 ggsave("Figures/SimFigs/gradient_bias.pdf")
 
-p_gradient_rrmse <- drop_na(results) %>% 
+p_gradient_rrmse <- res %>% 
   mutate(bias = est - truth) %>%
   group_by(B1_low, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
@@ -198,7 +243,17 @@ p_gradient_rrmse <- drop_na(results) %>%
   geom_line() +
   labs(x = "True Population Density Gradient", y = "RRMSE %") +
   theme_bw()
-p_gradient_rrmse
+p_gradient_rrmse_s <- res_s %>% 
+  mutate(bias = est - truth) %>%
+  group_by(B1_low, design) %>%
+  summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
+  ungroup() %>%
+  ggplot(aes(B1_low, rrmse, group = design, color = design)) + 
+  geom_point() +
+  geom_line() +
+  labs(x = "True Population Density Gradient", y = "RRMSE %") +
+  theme_bw()
+plot_grid(p_gradient_rrmse, p_gradient_rrmse_s, labels = "AUTO")
 ggsave("Figures/SimFigs/gradient_rrmse.pdf")
 
 
