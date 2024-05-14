@@ -42,7 +42,7 @@ params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 # define empty object to house results dataframe
 results_adapt <- data.frame(matrix(NA, nrow(params), ncol(params) + 6))
 colnames(results_adapt) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth", "design")
-results_noadapt <- results_sonly <- results_srs <- results_adapt
+results_noadapt <- results_sonly <- results_srs <- results_adapt <- results_sextrap <- results_adapt_perf
 
 
 # simulate cold pool extent from random march sea ice values
@@ -90,6 +90,10 @@ for(i in 1:nrow(params)){
                               cold_pool_value, 
                               abundance(d, ice_value, n, design = "adaptive stratified")
                               )
+  results_adapt_perf[i, ] <- bind_cols(params[i, ], 
+                                  cold_pool_value, 
+                                  abundance(d, ice_value, n, design = "adaptive stratified perfect")
+  )
   results_noadapt[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
                               abundance(d, ice_value, n, design = "proportional stratified")
@@ -102,10 +106,14 @@ for(i in 1:nrow(params)){
                              cold_pool_value, 
                              abundance(d, ice_value, n, design = "south stratum only")
   )
+  results_sextrap[i, ] <- bind_cols(params[i, ], 
+                                  cold_pool_value, 
+                                  abundance(d, ice_value, n, design = "south stratum extrapolated")
+  )
 }
 
-results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs)
-#saveRDS(results, "results.RDS")
+results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap)
+saveRDS(results, "results.RDS")
 
 
 # Plots for cold pool sea ice simulations -----

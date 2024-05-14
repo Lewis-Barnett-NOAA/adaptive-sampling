@@ -63,10 +63,10 @@ get_operating_model <- function(cold_pool_value, params) {
 }
 
 # Simulate sampling
-abundance <- function(d, ice_value, n, design = c(
-  "adaptive stratified","proportional stratified",
-  "simple random", "south stratum only", "south stratum extrapolated"
-)) {
+abundance <- function(d, ice_value, n, 
+  design = c("adaptive stratified", "adaptive stratified perfect",
+             "proportional stratified", "simple random", "south stratum only", 
+             "south stratum extrapolated")) {
   
   d$strata <- ifelse(d$Y > 50, 1, 2)
   
@@ -88,7 +88,28 @@ abundance <- function(d, ice_value, n, design = c(
                mean(samples_south) * nrow(d[d$strata == 2,])
     )
   }
- 
+  
+  if(design == "adaptive stratified perfect") {
+    # Define sampling proportions based on actual cold pool extent rather than sea ice
+    # i.e., as if you had perfect information from the sea ice indicator
+    if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.1)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.9)
+      
+    } else if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.25)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.75)
+      
+    } else if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
+    }
+    # estimate abundance
+    est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
+               mean(samples_south) * nrow(d[d$strata == 2,])
+    )
+  }
+
   if(design == "proportional stratified") {
     samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
     samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
@@ -121,7 +142,7 @@ abundance <- function(d, ice_value, n, design = c(
 }
 
 # simulate observations for plotting
-sampling <- function(d, ice_value, n, ind_error = TRUE) {
+sampling <- function(d, ice_value, n) {
   # Define strata based on Y values
   d$strata <- ifelse(d$Y > 50, 1, 2)
   
@@ -137,21 +158,8 @@ sampling <- function(d, ice_value, n, ind_error = TRUE) {
       prop_north <- 0.5
       prop_south <- 0.5
     }
-  } else {
-    # Define sampling proportions based on actual cold pool extent
-    # i.e., if you had perfect information from the sea ice indicator
-    if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
-      prop_north <- 0.1
-      prop_south <- 0.9
-    } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
-      prop_north <- 0.25
-      prop_south <- 0.75
-    } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
-      prop_north <- 0.5
-      prop_south <- 0.5
-    }
   }
-
+  
   # Sample row indices for north and south strata
   indices_north <- sample(which(d$strata == 1), floor(n * prop_north))
   indices_south <- sample(which(d$strata == 2), floor(n * prop_south))
