@@ -112,7 +112,7 @@ for(i in 1:nrow(params)){
   )
 }
 
-results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap)
+results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap, results_adapt_perf)
 saveRDS(results, "results.RDS")
 
 
