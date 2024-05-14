@@ -42,7 +42,7 @@ params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 # define empty object to house results dataframe
 results_adapt <- data.frame(matrix(NA, nrow(params), ncol(params) + 6))
 colnames(results_adapt) <- c(colnames(params), "coldpool", "n", "ice_value", "est", "truth", "design")
-results_noadapt <- results_sonly <- results_srs <- results_adapt <- results_sextrap <- results_adapt_perf
+results_noadapt <- results_sonly <- results_srs <- results_sextrap <- results_adapt_perf <- results_adapt 
 
 
 # simulate cold pool extent from random march sea ice values
