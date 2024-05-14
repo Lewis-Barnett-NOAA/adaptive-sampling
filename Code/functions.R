@@ -115,22 +115,37 @@ abundance <- function(d, ice_value, n, design = c(
 }
 
 # simulate observations for plotting
-sampling <- function(d, ice_value, n) {
+sampling <- function(d, ice_value, n, ind_error = TRUE) {
   # Define strata based on Y values
   d$strata <- ifelse(d$Y > 50, 1, 2)
   
-  # Define sampling proportions based on ice_value
-  if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
-    prop_north <- 0.1
-    prop_south <- 0.9
-  } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
-    prop_north <- 0.25
-    prop_south <- 0.75
-  } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
-    prop_north <- 0.5
-    prop_south <- 0.5
+  if (ind_error == TRUE) {
+    # Define sampling proportions based on ice_value
+    if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
+      prop_north <- 0.1
+      prop_south <- 0.9
+    } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
+      prop_north <- 0.25
+      prop_south <- 0.75
+    } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
+      prop_north <- 0.5
+      prop_south <- 0.5
+    }
+  } else {
+    # Define sampling proportions based on actual cold pool extent
+    # i.e., if you had perfect information from the sea ice indicator
+    if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
+      prop_north <- 0.1
+      prop_south <- 0.9
+    } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
+      prop_north <- 0.25
+      prop_south <- 0.75
+    } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
+      prop_north <- 0.5
+      prop_south <- 0.5
+    }
   }
-  
+
   # Sample row indices for north and south strata
   indices_north <- sample(which(d$strata == 1), floor(n * prop_north))
   indices_south <- sample(which(d$strata == 2), floor(n * prop_south))
