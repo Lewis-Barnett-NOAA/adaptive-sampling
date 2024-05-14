@@ -88,27 +88,27 @@ for(i in 1:nrow(params)){
   # Append results to params
   results_adapt[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, design = "adaptive stratified")
+                              abundance(d, ice_value, cold_pool_value, n, design = "adaptive stratified")
                               )
   results_adapt_perf[i, ] <- bind_cols(params[i, ], 
                                   cold_pool_value, 
-                                  abundance(d, ice_value, n, design = "adaptive stratified perfect")
+                                  abundance(d, ice_value, cold_pool_value, n, design = "adaptive stratified perfect")
   )
   results_noadapt[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, design = "proportional stratified")
+                              abundance(d, ice_value, cold_pool_value, n, design = "proportional stratified")
                              )
   results_srs[i, ] <- bind_cols(params[i, ], 
                               cold_pool_value, 
-                              abundance(d, ice_value, n, design = "simple random")
+                              abundance(d, ice_value, cold_pool_value, n, design = "simple random")
                             )
   results_sonly[i, ] <- bind_cols(params[i, ], 
                              cold_pool_value, 
-                             abundance(d, ice_value, n, design = "south stratum only")
+                             abundance(d, ice_value, cold_pool_value, n, design = "south stratum only")
   )
   results_sextrap[i, ] <- bind_cols(params[i, ], 
                                   cold_pool_value, 
-                                  abundance(d, ice_value, n, design = "south stratum extrapolated")
+                                  abundance(d, ice_value, cold_pool_value, n, design = "south stratum extrapolated")
   )
 }
 
