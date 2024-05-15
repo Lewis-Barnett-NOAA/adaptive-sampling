@@ -84,7 +84,7 @@ for(i in 1:nrow(params)){
   # Draw a cold pool extent simulated from a random march sea ice proportion
   cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,][sample(1:(ncol(ordersimsx)-1), 1)])
   
-  d <- get_operating_model(cold_pool_value, params[i, ])
+  d <- get_operating_model_tw(cold_pool_value, params[i, ])
   
   # Append results to params
   results_adapt[i, ] <- bind_cols(params[i, ], 
@@ -314,7 +314,7 @@ ggplot(long_results_ice,aes(ice_value,value,fill=variable))+
 # plot operating model map with observations ----
 
 #representative range values
-op_low <- get_operating_model(100000, params[16,])
+op_low <- get_operating_model_tw(100000, params[16,])
 sim_dat <- sampling(op_low,0.5,100)
 
 range20 <- ggplot(op_low, aes(X, Y)) +
@@ -327,7 +327,7 @@ range20 <- ggplot(op_low, aes(X, Y)) +
 ggsave("Figures/SimFigs/range20_plot.png", range20)
 
 params[20,]
-op_low <- get_operating_model(100000, params[20,])
+op_low <- get_operating_model_tw(100000, params[20,])
 sim_dat <- sampling(op_low,0.5,100)
 
 range100 <- ggplot(op_low, aes(X, Y)) +
@@ -341,7 +341,7 @@ ggsave("Figures/SimFigs/range100_plot.png", range100)
 
 #representative density values
 params[13,]
-op_low <- get_operating_model(100000, params[13,])
+op_low <- get_operating_model_tw(100000, params[13,])
 sim_dat <- sampling(op_low,0.5,100)
 
 wk_grad <- ggplot(op_low, aes(X, Y)) +
@@ -354,7 +354,7 @@ wk_grad <- ggplot(op_low, aes(X, Y)) +
 ggsave("Figures/SimFigs/wk_grad_plot.png", wk_grad)
 
 params[88,]
-op_low <- get_operating_model(100000, params[88,])
+op_low <- get_operating_model_tw(100000, params[88,])
 sim_dat <- sampling(op_low,0.5,100)
 
 strng_grad <- ggplot(op_low, aes(X, Y)) +

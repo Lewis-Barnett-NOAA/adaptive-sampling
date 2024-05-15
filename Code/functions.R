@@ -4,7 +4,56 @@ simulateX <- function(object, nsim = 1, seed = NULL, X, ...) {
   simulate(object = object, nsim = nsim, seed = seed, ...)
 }
 
-# Function to determine the operating model based on sea ice value
+# Function to determine the operating model based on sea ice value, Tweedie
+get_operating_model_tw <- function(cold_pool_value, params) {
+  if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
+    sim_dat <- sdmTMB_simulate(
+      formula = ~ 1 + depth,
+      data = predictor_dat,
+      mesh = mesh,
+      family = tweedie(link = "log"),
+      B = c(0.1, params$B1_high), # B0 = intercept, B1 = depth coefficient slope
+      range = params$range,
+      sigma_O = 0.2,
+      phi = params$phi, # observation error scale parameter
+      tweedie_p = 1.5
+    )
+    return(sim_dat)
+    
+  } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
+    sim_dat <- sdmTMB_simulate(
+      formula = ~ 1 + depth,
+      data = predictor_dat,
+      mesh = mesh,
+      family = tweedie(link = "log"),
+      B = c(0.1, params$B1_mid), # B0 = intercept, B1 = depth coefficient slope
+      range = params$range,
+      sigma_O = 0.2,
+      phi = params$phi, # observation error scale parameter
+      tweedie_p = 1.5
+    )
+    return(sim_dat)
+    
+  } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
+    sim_dat <- sdmTMB_simulate(
+      formula = ~ 1 + depth,
+      data = predictor_dat,
+      mesh = mesh,
+      family = tweedie(link = "log"),
+      B = c(0.1, params$B1_low), # B0 = intercept, B1 = depth coefficient slope
+      range = params$range,
+      sigma_O = 0.2,
+      phi = params$phi, # observation error scale parameter
+      tweedie_p = 1.5
+    )
+    return(sim_dat)
+    
+  } else {
+    return("No Matching Operating Model")
+  }
+}
+
+# Function to determine the operating model based on sea ice value, Gaussian
 get_operating_model <- function(cold_pool_value, params) {
   if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
     sim_dat <- sdmTMB_simulate(
