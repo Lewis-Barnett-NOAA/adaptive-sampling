@@ -154,7 +154,7 @@ p_range_bias_s <- res_s %>%
   geom_boxplot() +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
-plot_grid(p_range_bias, p_range_bias_s, labels = "AUTO")
+plot_grid(p_range_bias, p_range_bias_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/range_bias.pdf")
 
 p_range_rrmse <- res %>% 
@@ -177,7 +177,7 @@ p_range_rrmse_s <- res_s %>%
   geom_line() +
   labs(x = "Spatial Range", y = "RRMSE %") +
   theme_bw()
-plot_grid(p_range_rrmse, p_range_rrmse_s, labels = "AUTO")
+plot_grid(p_range_rrmse, p_range_rrmse_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/range_rrmse.pdf")
 
 p_obserr_bias <- res %>% 
@@ -192,7 +192,7 @@ p_obserr_bias_s <- res_s %>%
   geom_boxplot() +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
-plot_grid(p_obserr_bias, p_obserr_bias_s, labels = "AUTO")
+plot_grid(p_obserr_bias, p_obserr_bias_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/obserr_bias.pdf")
 
 p_obserr_rrmse <- res %>% 
@@ -215,7 +215,7 @@ p_obserr_rrmse_s <- res_s %>%
   geom_line() +
   labs(x = "Observation Error SD", y = "RRMSE %") +
   theme_bw()
-plot_grid(p_obserr_rrmse, p_obserr_rrmse_s, labels = "AUTO")
+plot_grid(p_obserr_rrmse, p_obserr_rrmse_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/obserr_rrmse.pdf")           
 
 p_gradient_bias <- res %>% 
@@ -230,7 +230,7 @@ p_gradient_bias_s <- res_s %>%
   geom_boxplot() +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
-plot_grid(p_gradient_bias, p_gradient_bias_s, labels = "AUTO")
+plot_grid(p_gradient_bias, p_gradient_bias_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/gradient_bias.pdf")
 
 p_gradient_rrmse <- res %>% 
@@ -253,7 +253,7 @@ p_gradient_rrmse_s <- res_s %>%
   geom_line() +
   labs(x = "True Population Density Gradient", y = "RRMSE %") +
   theme_bw()
-plot_grid(p_gradient_rrmse, p_gradient_rrmse_s, labels = "AUTO")
+plot_grid(p_gradient_rrmse, p_gradient_rrmse_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/gradient_rrmse.pdf")
 
 
