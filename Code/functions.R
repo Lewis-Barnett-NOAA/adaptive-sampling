@@ -18,6 +18,7 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       phi = params$phi, # observation error scale parameter
       tweedie_p = 1.5
     )
+    sim_dat$eta <- exp(sim_dat$eta)
     return(sim_dat)
     
   } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
@@ -32,6 +33,7 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       phi = params$phi, # observation error scale parameter
       tweedie_p = 1.5
     )
+    sim_dat$eta <- exp(sim_dat$eta)
     return(sim_dat)
     
   } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
@@ -46,6 +48,7 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       phi = params$phi, # observation error scale parameter
       tweedie_p = 1.5
     )
+    sim_dat$eta <- exp(sim_dat$eta)
     return(sim_dat)
     
   } else {
