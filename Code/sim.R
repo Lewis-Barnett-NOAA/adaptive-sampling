@@ -10,7 +10,7 @@ library(cowplot)
 set.seed(123)
 
 # Sample size
-n <- 25
+n <- 100
 
 #Sampling units in domain
 N <- 1000
@@ -37,7 +37,7 @@ params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
 
 # replicate parameter df once per simulation replicate
-n_rep <- 100
+n_rep <- 10
 params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 
 # define empty object to house results dataframe
