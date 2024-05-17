@@ -27,7 +27,7 @@ mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", 
 
 #define parameters to loop over in operating models
 ranges <- seq(20, 100, 20) # spatial range (higher = smoother, lower = patchier)
-phis <- seq(0, 0.1, 0.05) # observation error
+phis <- seq(0.01, 0.05, 0.01) # observation error
 B1_lows <- seq(0, 0.3, 0.1) # slope of depth-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 
