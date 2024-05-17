@@ -27,7 +27,7 @@ mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", 
 
 #define parameters to loop over in operating models
 ranges <- seq(20, 100, 20) # spatial range (higher = smoother, lower = patchier)
-phis <- seq(0.1, 0.5, 0.1) # observation error
+phis <- seq(0, 0.1, 0.05) # observation error
 B1_lows <- seq(0, 0.3, 0.1) # slope of depth-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 
@@ -115,7 +115,7 @@ for(i in 1:nrow(params)){
 
 results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap, results_adapt_perf)
 #saveRDS(results, "results.RDS")
-saveRDS(results, "results_tw_n25.RDS")
+saveRDS(results, "results_tw_nrep25.RDS")
 
 
 # Plots for cold pool sea ice simulations -----
