@@ -146,13 +146,13 @@ res_s <- drop_na(results) %>%
 p_range_bias <- res %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
-  geom_boxplot() +
+  geom_boxplot(outlier.shape=NA) +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 p_range_bias_s <- res_s %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
-  geom_boxplot() +
+  geom_boxplot(outlier.shape=NA) +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 plot_grid(p_range_bias, p_range_bias_s, labels = "AUTO", ncol = 1)
@@ -184,13 +184,13 @@ ggsave("Figures/SimFigs/range_rrmse.pdf")
 p_obserr_bias <- res %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
-  geom_boxplot() +
+  geom_boxplot(outlier.shape=NA) +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 p_obserr_bias_s <- res_s %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
-  geom_boxplot() +
+  geom_boxplot(outlier.shape=NA) +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 plot_grid(p_obserr_bias, p_obserr_bias_s, labels = "AUTO", ncol = 1)
@@ -222,13 +222,13 @@ ggsave("Figures/SimFigs/obserr_rrmse.pdf")
 p_gradient_bias <- res %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
-  geom_boxplot() +
+  geom_boxplot(outlier.shape=NA) +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 p_gradient_bias_s <- res_s %>% 
   mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
-  geom_boxplot() +
+  geom_boxplot(outlier.shape=NA) +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 plot_grid(p_gradient_bias, p_gradient_bias_s, labels = "AUTO", ncol = 1)
