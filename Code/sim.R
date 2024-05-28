@@ -114,13 +114,13 @@ for(i in 1:nrow(params)){
 }
 
 results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap, results_adapt_perf)
-#saveRDS(results, "results.RDS")
-saveRDS(results, "results_tw_p9_omega1_nrep50_n250.RDS")
+#saveRDS(results, "results_tw_p9_omega1_nrep50_n250.RDS")
 
 
 # Plots for cold pool sea ice simulations -----
 
-#results <- readRDS("results.RDS") #load results
+#results <- readRDS("results_tw_p9_omega1_nrep50_n250.RDS") #load results
+
 p_gradient <-
   ggplot(predictor_dat, aes(X, Y)) +
     geom_tile(aes(fill = depth)) +
@@ -139,27 +139,28 @@ ggsave("Figures/SimFigs/sea_ice_coldpool_sims.pdf")
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
 # separate panels for the south only scenarios
 res <- drop_na(results) %>% 
-  filter(!design %in% c("south stratum only", "south stratum extrapolated"))
+  filter(!design %in% c("south stratum only", "south stratum extrapolated")) %>% 
+  mutate(bias = est - truth)
 res_s <- drop_na(results) %>% 
-  filter(design %in% c("south stratum only", "south stratum extrapolated"))
+  filter(design %in% c("south stratum only", "south stratum extrapolated")) %>% 
+  mutate(bias = est - truth)
 
 p_range_bias <- res %>% 
-  mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
-  geom_boxplot(outlier.shape=NA) +
+  geom_boxplot(outlier.shape=NA) + 
+  coord_cartesian(ylim = quantile(res$bias, c(0.225, 0.799))) +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 p_range_bias_s <- res_s %>% 
-  mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(range), bias, fill = as.factor(design))) + 
-  geom_boxplot(outlier.shape=NA) +
+  geom_boxplot(outlier.shape=NA) + 
+  coord_cartesian(ylim = quantile(res_s$bias, c(0.115, 0.879))) +
   labs(x = "Spatial Range", y = "Bias") +
   theme_bw()
 plot_grid(p_range_bias, p_range_bias_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/range_bias.pdf")
 
 p_range_rrmse <- res %>% 
-  mutate(bias = est - truth) %>%
   group_by(range, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
@@ -169,7 +170,6 @@ p_range_rrmse <- res %>%
   labs(x = "Spatial Range", y = "RRMSE %") +
   theme_bw()
 p_range_rrmse_s <- res_s %>% 
-  mutate(bias = est - truth) %>%
   group_by(range, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
@@ -182,22 +182,21 @@ plot_grid(p_range_rrmse, p_range_rrmse_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/range_rrmse.pdf")
 
 p_obserr_bias <- res %>% 
-  mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
-  geom_boxplot(outlier.shape=NA) +
+  geom_boxplot(outlier.shape=NA) + 
+  coord_cartesian(ylim = quantile(res$bias, c(0.225, 0.799))) +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 p_obserr_bias_s <- res_s %>% 
-  mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(phi), bias, fill = as.factor(design))) + 
-  geom_boxplot(outlier.shape=NA) +
+  geom_boxplot(outlier.shape=NA) + 
+  coord_cartesian(ylim = quantile(res_s$bias, c(0.05, 0.877))) +
   labs(x = "Observation Error SD", y = "Bias") +
   theme_bw()
 plot_grid(p_obserr_bias, p_obserr_bias_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/obserr_bias.pdf")
 
 p_obserr_rrmse <- res %>% 
-  mutate(bias = est - truth) %>%
   group_by(phi, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
@@ -207,7 +206,6 @@ p_obserr_rrmse <- res %>%
   labs(x = "Observation Error SD", y = "RRMSE %") +
   theme_bw()
 p_obserr_rrmse_s <- res_s %>% 
-  mutate(bias = est - truth) %>%
   group_by(phi, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
@@ -220,22 +218,21 @@ plot_grid(p_obserr_rrmse, p_obserr_rrmse_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/obserr_rrmse.pdf")           
 
 p_gradient_bias <- res %>% 
-  mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
-  geom_boxplot(outlier.shape=NA) +
+  geom_boxplot(outlier.shape=NA) + 
+  coord_cartesian(ylim = quantile(res$bias, c(0.12, 0.88))) +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 p_gradient_bias_s <- res_s %>% 
-  mutate(bias = est - truth) %>%
   ggplot(aes(as.factor(B1_low), bias, fill = as.factor(design))) + 
-  geom_boxplot(outlier.shape=NA) +
+  geom_boxplot(outlier.shape=NA) + 
+  coord_cartesian(ylim = quantile(res_s$bias, c(0.1, 0.87))) +
   labs(x = "True Population Density Gradient", y = "Bias") +
   theme_bw()
 plot_grid(p_gradient_bias, p_gradient_bias_s, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/gradient_bias.pdf")
 
 p_gradient_rrmse <- res %>% 
-  mutate(bias = est - truth) %>%
   group_by(B1_low, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
@@ -245,7 +242,6 @@ p_gradient_rrmse <- res %>%
   labs(x = "True Population Density Gradient", y = "RRMSE %") +
   theme_bw()
 p_gradient_rrmse_s <- res_s %>% 
-  mutate(bias = est - truth) %>%
   group_by(B1_low, design) %>%
   summarise(rrmse = (sqrt(mean(bias ^ 2)) / mean(est)) * 100) %>%
   ungroup() %>%
