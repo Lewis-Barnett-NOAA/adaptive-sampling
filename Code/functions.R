@@ -15,10 +15,11 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       B = c(0.1, params$B1_high), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
       sigma_O = 0.2,
-      phi = params$phi, # observation error scale parameter
+      phi = params$phi, # dispersion parameter
       tweedie_p = 1.9 # 1.75 for more like gamma, 1.25 for more like Poisson
     )
-    sim_dat$eta <- exp(sim_dat$eta)
+    #sim_dat$eta <- exp(sim_dat$eta)
+    sim_dat$observed <- log(sim_dat$observed)
     return(sim_dat)
     
   } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
@@ -30,10 +31,11 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       B = c(0.1, params$B1_mid), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
       sigma_O = 0.2,
-      phi = params$phi, # observation error scale parameter
+      phi = params$phi, # dispersion parameter
       tweedie_p = 1.9
     )
-    sim_dat$eta <- exp(sim_dat$eta)
+    #sim_dat$eta <- exp(sim_dat$eta)
+    sim_dat$observed <- log(sim_dat$observed)
     return(sim_dat)
     
   } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
@@ -45,10 +47,11 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       B = c(0.1, params$B1_low), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
       sigma_O = 0.2,
-      phi = params$phi, # observation error scale parameter
+      phi = params$phi, # dispersion parameter
       tweedie_p = 1.9
     )
-    sim_dat$eta <- exp(sim_dat$eta)
+    #sim_dat$eta <- exp(sim_dat$eta)
+    sim_dat$observed <- log(sim_dat$observed)
     return(sim_dat)
     
   } else {
@@ -56,23 +59,20 @@ get_operating_model_tw <- function(cold_pool_value, params) {
   }
 }
 
-# Function to determine the operating model based on sea ice value, Gaussian
+# Function to determine the operating model based on sea ice value, lognormal
 get_operating_model <- function(cold_pool_value, params) {
   if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
     sim_dat <- sdmTMB_simulate(
       formula = ~ 1 + depth,
       data = predictor_dat,
       mesh = mesh,
-      family = gaussian(link = "identity"),
+      family = lognormal(link = "log"),
       B = c(0.1, params$B1_high), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
       sigma_O = 0.2,
       phi = params$phi # SD of observation error in this (Gaussian) case
     )
-    
-    sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
-    sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
-    
+    sim_dat$observed <- log(sim_dat$observed)
     return(sim_dat)
     
   } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
@@ -80,16 +80,13 @@ get_operating_model <- function(cold_pool_value, params) {
       formula = ~ 1 + depth,
       data = predictor_dat,
       mesh = mesh,
-      family = gaussian(link = "identity"),
+      family = lognormal(link = "log"),
       B = c(0.1, params$B1_mid), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
       sigma_O = 0.2,
       phi = params$phi # SD of observation error in this (Gaussian) case
     )
-    
-    sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
-    sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
-    
+    sim_dat$observed <- log(sim_dat$observed)
     return(sim_dat)
     
   } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
@@ -97,16 +94,13 @@ get_operating_model <- function(cold_pool_value, params) {
       formula = ~ 1 + depth,
       data = predictor_dat,
       mesh = mesh,
-      family = gaussian(link = "identity"),
+      family = lognormal(link = "log"),
       B = c(0.1, params$B1_low), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
       sigma_O = 0.2,
       phi = params$phi # SD of observation error in this (Gaussian) case
     )
-    
-    sim_dat$eta <- (sim_dat$eta - min(sim_dat$eta))
-    sim_dat$observed <- (sim_dat$observed - min(sim_dat$observed))
-    
+    sim_dat$observed <- log(sim_dat$observed)
     return(sim_dat)
     
   } else {
