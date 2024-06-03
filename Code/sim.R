@@ -26,9 +26,9 @@ mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", 
 #plot(mesh)
 
 #define parameters to loop over in operating models
-ranges <- c(10, 50, 100) # spatial range (higher = smoother, lower = patchier)
-phis <- c(0.01, 0.03, 0.05) # observation error or dispersion
-B1_lows <- seq(0, 0.3, 0.1) # slope of depth-density relationship in low cold pool scenario
+ranges <- seq(20, 100, 20) #c(20, 60, 100) spatial range (higher = smoother, lower = patchier)
+phis <- seq(0.01, 0.05, 0.01) #c(0.01, 0.03, 0.05) observation error or dispersion
+B1_lows <- seq(0, 0.3, 0.1) #c(0, 0.2, 0.4) slope of depth-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
@@ -111,8 +111,7 @@ for(i in 1:nrow(params)){
 }
 
 results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap, results_adapt_perf)
-saveRDS(results, "results_tw_p9_nrep50_n250.RDS")
-#saveRDS(results, "results_lognormal.RDS")
+saveRDS(results, "results_tw_p9_omega1_nrep50_n250.RDS")
 
 
 # Plots for cold pool sea ice simulations -----
@@ -122,8 +121,8 @@ saveRDS(results, "results_tw_p9_nrep50_n250.RDS")
 p_gradient <-
   ggplot(predictor_dat, aes(X, Y)) +
     geom_tile(aes(fill = depth)) +
-    scale_color_gradient2()
-theme_bw()
+    scale_color_gradient2() +
+    theme_bw()
 p_gradient
 ggsave("Figures/SimFigs/gradient_fake_covar.pdf")
 
