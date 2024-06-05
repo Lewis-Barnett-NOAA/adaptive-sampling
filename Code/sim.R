@@ -34,7 +34,7 @@ params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
 
 # replicate parameter df once per simulation replicate
-n_rep <- 75
+n_rep <- 100
 params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
 
 # define empty object to house results dataframe
@@ -111,7 +111,7 @@ for(i in 1:nrow(params)){
 }
 
 results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap, results_adapt_perf)
-saveRDS(results, "results_tw_p9_omega1_nrep50_n250_3Xparams_natural.RDS")
+saveRDS(results, "results_tw_p9_omega1_nrep100_n250_3Xparams_natural.RDS")
 
 
 # Plots for cold pool sea ice simulations -----
