@@ -261,101 +261,101 @@ ggsave("Figures/SimFigs/gradient_rrmse.pdf")
 # ggplot(data = results, aes(x = range, y = truth, group = range)) +
 #   geom_boxplot()
 
-#range
-results_range <- select(results, range, est, truth)
-long_results_r <- melt(results_range, id.vars = "range")
-
-ggplot(long_results_r,aes(range,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge")
-#ggsave("Figures/SimFigs/rangecomp.pdf")
-
-#phi
-results_phi <- select(results, phi, est, truth)
-long_results_p <- melt(results_phi, id.vars = "phi")
-
-ggplot(long_results_p,aes(phi,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge")
-
-#b1_low
-results_b1 <- select(results, B1_low, est, truth)
-long_results_b1 <- melt(results_b1, id.vars = "B1_low")
-
-ggplot(long_results_b1,aes(B1_low,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge")
-
-#b1_mid
-results_bm <- select(results, B1_mid, est, truth)
-long_results_bm <- melt(results_bm, id.vars = "B1_mid")
-
-ggplot(long_results_bm,aes(B1_mid,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge")
-
-#b1_high
-results_bh <- select(results, B1_high, est, truth)
-long_results_bh <- melt(results_bh, id.vars = "B1_high")
-
-ggplot(long_results_bh,aes(B1_high,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge")
-
-#ice_value
-results_ice <- select(results, ice_value, est, truth)
-long_results_ice <- melt(results_ice, id.vars = "ice_value")
-
-ggplot(long_results_ice,aes(ice_value,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge")
-
-
-# plot operating model map with observations ----
-
-#representative range values
-op_low <- get_operating_model_tw(100000, params[16,])
-sim_dat <- sampling(op_low,0.5,100)
-
-range20 <- ggplot(op_low, aes(X, Y)) +
-  geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
-  scale_fill_viridis_c() +
-  scale_size_area() +
-  coord_cartesian(expand = FALSE)
-ggsave("Figures/SimFigs/range20_plot.png", range20)
-
-params[20,]
-op_low <- get_operating_model_tw(100000, params[20,])
-sim_dat <- sampling(op_low,0.5,100)
-
-range100 <- ggplot(op_low, aes(X, Y)) +
-  geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
-  scale_fill_viridis_c() +
-  scale_size_area() +
-  coord_cartesian(expand = FALSE)
-ggsave("Figures/SimFigs/range100_plot.png", range100)
-
-#representative density values
-params[13,]
-op_low <- get_operating_model_tw(100000, params[13,])
-sim_dat <- sampling(op_low,0.5,100)
-
-wk_grad <- ggplot(op_low, aes(X, Y)) +
-  geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
-  scale_fill_viridis_c() +
-  scale_size_area() +
-  coord_cartesian(expand = FALSE)
-ggsave("Figures/SimFigs/wk_grad_plot.png", wk_grad)
-
-params[88,]
-op_low <- get_operating_model_tw(100000, params[88,])
-sim_dat <- sampling(op_low,0.5,100)
-
-strng_grad <- ggplot(op_low, aes(X, Y)) +
-  geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
-  scale_fill_viridis_c() +
-  scale_size_area() +
-  coord_cartesian(expand = FALSE)
-ggsave("Figures/SimFigs/strng_grad_plot.png", strng_grad)
+# #range
+# results_range <- select(results, range, est, truth)
+# long_results_r <- melt(results_range, id.vars = "range")
+# 
+# ggplot(long_results_r,aes(range,value,fill=variable))+
+#   geom_bar(stat="identity",position="dodge")
+# #ggsave("Figures/SimFigs/rangecomp.pdf")
+# 
+# #phi
+# results_phi <- select(results, phi, est, truth)
+# long_results_p <- melt(results_phi, id.vars = "phi")
+# 
+# ggplot(long_results_p,aes(phi,value,fill=variable))+
+#   geom_bar(stat="identity",position="dodge")
+# 
+# #b1_low
+# results_b1 <- select(results, B1_low, est, truth)
+# long_results_b1 <- melt(results_b1, id.vars = "B1_low")
+# 
+# ggplot(long_results_b1,aes(B1_low,value,fill=variable))+
+#   geom_bar(stat="identity",position="dodge")
+# 
+# #b1_mid
+# results_bm <- select(results, B1_mid, est, truth)
+# long_results_bm <- melt(results_bm, id.vars = "B1_mid")
+# 
+# ggplot(long_results_bm,aes(B1_mid,value,fill=variable))+
+#   geom_bar(stat="identity",position="dodge")
+# 
+# #b1_high
+# results_bh <- select(results, B1_high, est, truth)
+# long_results_bh <- melt(results_bh, id.vars = "B1_high")
+# 
+# ggplot(long_results_bh,aes(B1_high,value,fill=variable))+
+#   geom_bar(stat="identity",position="dodge")
+# 
+# #ice_value
+# results_ice <- select(results, ice_value, est, truth)
+# long_results_ice <- melt(results_ice, id.vars = "ice_value")
+# 
+# ggplot(long_results_ice,aes(ice_value,value,fill=variable))+
+#   geom_bar(stat="identity",position="dodge")
+# 
+# 
+# # plot operating model map with observations ----
+# 
+# #representative range values
+# op_low <- get_operating_model_tw(100000, params[16,])
+# sim_dat <- sampling(op_low,0.5,100)
+# 
+# range20 <- ggplot(op_low, aes(X, Y)) +
+#   geom_raster(aes(fill = eta)) +
+#   geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+#   geom_hline(aes(yintercept = 50)) +
+#   scale_fill_viridis_c() +
+#   scale_size_area() +
+#   coord_cartesian(expand = FALSE)
+# ggsave("Figures/SimFigs/range20_plot.png", range20)
+# 
+# params[20,]
+# op_low <- get_operating_model_tw(100000, params[20,])
+# sim_dat <- sampling(op_low,0.5,100)
+# 
+# range100 <- ggplot(op_low, aes(X, Y)) +
+#   geom_raster(aes(fill = eta)) +
+#   geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+#   geom_hline(aes(yintercept = 50)) +
+#   scale_fill_viridis_c() +
+#   scale_size_area() +
+#   coord_cartesian(expand = FALSE)
+# ggsave("Figures/SimFigs/range100_plot.png", range100)
+# 
+# #representative density values
+# params[13,]
+# op_low <- get_operating_model_tw(100000, params[13,])
+# sim_dat <- sampling(op_low,0.5,100)
+# 
+# wk_grad <- ggplot(op_low, aes(X, Y)) +
+#   geom_raster(aes(fill = eta)) +
+#   geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+#   geom_hline(aes(yintercept = 50)) +
+#   scale_fill_viridis_c() +
+#   scale_size_area() +
+#   coord_cartesian(expand = FALSE)
+# ggsave("Figures/SimFigs/wk_grad_plot.png", wk_grad)
+# 
+# params[88,]
+# op_low <- get_operating_model_tw(100000, params[88,])
+# sim_dat <- sampling(op_low,0.5,100)
+# 
+# strng_grad <- ggplot(op_low, aes(X, Y)) +
+#   geom_raster(aes(fill = eta)) +
+#   geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+#   geom_hline(aes(yintercept = 50)) +
+#   scale_fill_viridis_c() +
+#   scale_size_area() +
+#   coord_cartesian(expand = FALSE)
+# ggsave("Figures/SimFigs/strng_grad_plot.png", strng_grad)
