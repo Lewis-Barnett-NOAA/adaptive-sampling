@@ -15,10 +15,10 @@ n <- 250
 #Sampling units in domain
 N <- 1000
 
-#make data frame including fake "depth" covariate gradient
+#make data frame including fake "temperature" covariate gradient
 predictor_dat <- data.frame(
   expand.grid(X = 1:(N/10), Y = 1:(N/10)),
-  depth = rep(rev(seq(1, N/10)), each = N/10)
+  temperature = rep(rev(seq(1, N/10)), each = N/10)
 )
 
 #get triangulated mesh to simulate from
@@ -28,7 +28,7 @@ mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", 
 #define parameters to loop over in operating models
 ranges <- c(20, 60, 100) # spatial range (higher = smoother, lower = patchier)
 phis <- c(0.01, 0.03, 0.05) # observation error or dispersion
-B1_lows <- c(0, 0.2, 0.4) # slope of depth-density relationship in low cold pool scenario
+B1_lows <- c(0, 0.2, 0.4) # slope of temperature-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
@@ -120,7 +120,7 @@ saveRDS(results, "results_tw_p9_omega1_nrep100_n250_3Xparams_natural.RDS")
 
 p_gradient <-
   ggplot(predictor_dat, aes(X, Y)) +
-    geom_tile(aes(fill = depth)) +
+    geom_tile(aes(fill = temperature_scaled)) +
     scale_color_gradient2() +
     theme_bw()
 p_gradient
