@@ -8,7 +8,7 @@ simulateX <- function(object, nsim = 1, seed = NULL, X, ...) {
 get_operating_model_tw <- function(cold_pool_value, params) {
   if (cold_pool_value >= high_cp[1] && cold_pool_value <= high_cp[2]) {
     sim_dat <- sdmTMB_simulate(
-      formula = ~ 1 + depth,
+      formula = ~ 1 + temperature_scaled,
       data = predictor_dat,
       mesh = mesh,
       family = tweedie(link = "log"),
@@ -24,7 +24,7 @@ get_operating_model_tw <- function(cold_pool_value, params) {
     
   } else if (cold_pool_value >= mid_cp[1] && cold_pool_value <= mid_cp[2]) {
     sim_dat <- sdmTMB_simulate(
-      formula = ~ 1 + depth,
+      formula = ~ 1 + temperature_scaled,
       data = predictor_dat,
       mesh = mesh,
       family = tweedie(link = "log"),
@@ -40,7 +40,7 @@ get_operating_model_tw <- function(cold_pool_value, params) {
     
   } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
     sim_dat <- sdmTMB_simulate(
-      formula = ~ 1 + depth,
+      formula = ~ 1 + temperature_scaled,
       data = predictor_dat,
       mesh = mesh,
       family = tweedie(link = "log"),
