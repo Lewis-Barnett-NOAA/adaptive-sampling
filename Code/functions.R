@@ -11,10 +11,10 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       formula = ~ 1 + temperature_scaled,
       data = predictor_dat,
       mesh = mesh,
-      family = tweedie(link = "log"),
-      B = c(0.1, params$B1_high), # B0 = intercept, B1 = depth coefficient slope
+      family = tweedie(),
+      B = c(0.2, params$B1_high), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
-      sigma_O = 0.1,
+      sigma_O = 0.2,
       phi = params$phi, # dispersion parameter
       tweedie_p = 1.9 # 1.75 for more like gamma, 1.25 for more like Poisson
     )
@@ -27,10 +27,10 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       formula = ~ 1 + temperature_scaled,
       data = predictor_dat,
       mesh = mesh,
-      family = tweedie(link = "log"),
-      B = c(0.1, params$B1_mid), # B0 = intercept, B1 = depth coefficient slope
+      family = tweedie(),
+      B = c(0.2, params$B1_mid), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
-      sigma_O = 0.1,
+      sigma_O = 0.2,
       phi = params$phi, # dispersion parameter
       tweedie_p = 1.9
     )
@@ -43,10 +43,10 @@ get_operating_model_tw <- function(cold_pool_value, params) {
       formula = ~ 1 + temperature_scaled,
       data = predictor_dat,
       mesh = mesh,
-      family = tweedie(link = "log"),
-      B = c(0.1, params$B1_low), # B0 = intercept, B1 = depth coefficient slope
+      family = tweedie(),
+      B = c(0.2, params$B1_low), # B0 = intercept, B1 = depth coefficient slope
       range = params$range,
-      sigma_O = 0.1,
+      sigma_O = 0.2,
       phi = params$phi, # dispersion parameter
       tweedie_p = 1.9
     )
