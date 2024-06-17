@@ -201,8 +201,8 @@ sampling <- function(d, ice_value, n) {
       prop_north <- 0.25
       prop_south <- 0.75
     } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
-      prop_north <- 0.5
-      prop_south <- 0.5
+      prop_north <- 0.6
+      prop_south <- 0.4
     }
   }
   
