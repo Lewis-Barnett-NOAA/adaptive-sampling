@@ -29,7 +29,7 @@ plot(mesh)
 #define parameters to loop over in operating models
 ranges <- c(10, 50, 100, 200) # spatial range (higher = smoother, lower = patchier)
 phis <- c(0.01, 0.1, 0.2, 0.3) # observation error or dispersion depending on distribution
-B1_lows <- c(-0.2, -0.1, 0, 0.1) # slope of temperature-density relationship in low cold pool scenario
+B1_lows <- c(-0.3, -0.2, -0.1, 0, 0.1) # slope of temperature-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
@@ -112,7 +112,7 @@ for(i in 1:nrow(params)){
 }
 
 results <- bind_rows(results_adapt, results_sonly, results_noadapt, results_srs, results_sextrap, results_adapt_perf)
-saveRDS(results, "results_weaker_sampling_gradient.RDS")
+saveRDS(results, "results.RDS")
 
 
 # Plots for cold pool sea ice simulations -----
