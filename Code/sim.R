@@ -27,9 +27,9 @@ mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", 
 plot(mesh)
 
 #define parameters to loop over in operating models
-ranges <- c(10, 50, 100, 200) # spatial range (higher = smoother, lower = patchier)
-phis <- c(0.01, 0.1, 0.2, 0.3) # observation error or dispersion depending on distribution
-B1_lows <- c(-0.3, -0.2, -0.1, 0, 0.1) # slope of temperature-density relationship in low cold pool scenario
+ranges <- c(5, 50, 100, 200) # spatial range (higher = smoother, lower = patchier)
+phis <- c(0.01, 0.1, 0.3, 0.5) # observation error or dispersion depending on distribution
+B1_lows <- c(-0.25, -0.1, 0, 0.1, 0.25) # slope of temperature-density relationship in low cold pool scenario
 params <- as.data.frame(expand.grid(range=ranges, phi=phis, B1_low=B1_lows))
 params$B1_mid <- params$B1_low + 0.3
 params$B1_high <- params$B1_low + 0.6
@@ -117,7 +117,7 @@ saveRDS(results, "results.RDS")
 
 # Plots for cold pool sea ice simulations -----
 
-#results <- readRDS("results.RDS") #load results
+results <- readRDS("results_tw_p9_omega2_nrep100_n50_newparams_scaled.RDS") #load results
 
 p_gradient <-
   ggplot(predictor_dat, aes(X, Y)) +
@@ -137,7 +137,8 @@ ggsave("Figures/SimFigs/sea_ice_coldpool_sims.pdf")
 # plot bias and RRMSE of abundance estimates, grouped by scenario ----
 # separate panels for the south only scenarios
 res <- drop_na(results) %>% 
-  filter(!design %in% c("south stratum only", "south stratum extrapolated")) %>% 
+  filter(!design %in% c("south stratum only", "south stratum extrapolated", 
+                        "adaptive stratified perfect")) %>% 
   mutate(bias = est - truth)
 res_s <- drop_na(results) %>% 
   filter(design %in% c("south stratum only", "south stratum extrapolated")) %>% 
