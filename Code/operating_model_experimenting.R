@@ -52,59 +52,109 @@ cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,]
 
 d <- get_operating_model_tw(cold_pool_value, params[88, ])
 
-sim_dat <- sampling(d,ice_value,100)
+sim_dat <- sampling(d,ice_value,35)
 #op <- get_operating_model_tw(150000, params[88,])
 
-ggplot(d, aes(X, Y)) +
+strng_grad <- ggplot(d, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21) +
   geom_hline(aes(yintercept = 50)) +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE)+
+  labs(title = "Strong Gradient") +  # Add title for Plot A
+  theme(
+    legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
+    legend.text = element_text(size = 8)   # Shrink legend text
+  )
 #weakest gradient with medium range and medium observation error
-op <- get_operating_model_tw(150000, params[8,])
+op <- get_operating_model_tw(cold_pool_value, params[8,])
+sim_dat <- sampling(op,ice_value,35)
 
-ggplot(op, aes(X, Y)) +
+wk_grad <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
   geom_hline(aes(yintercept = 50)) +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE)+
+  labs(title = "Weak Gradient")+
+  theme(
+    legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
+    legend.text = element_text(size = 8)   # Shrink legend text
+  )
+
+plot_grid(strng_grad, wk_grad, labels = "AUTO", ncol = 1)
+ggsave("Figures/SimFigs/gradient_vis.pdf")
 
 #medium gradient with lowest range and medium observation error
-op <- get_operating_model_tw(150000, params[46,])
+op <- get_operating_model_tw(cold_pool_value, params[46,])
+sim_dat <- sampling(op,ice_value,35)
 
-ggplot(op, aes(X, Y)) +
+low_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
   geom_hline(aes(yintercept = 50)) +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE)+
+  labs(title = "Low Range") +  # Add title for Plot A
+  theme(
+    legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
+    legend.text = element_text(size = 8)   # Shrink legend text
+  )
 #medium gradient with highest range and medium observation error
-op <- get_operating_model_tw(150000, params[50,])
+op <- get_operating_model_tw(cold_pool_value, params[50,])
+sim_dat <- sampling(op,ice_value,35)
 
-ggplot(op, aes(X, Y)) +
+high_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
   geom_hline(aes(yintercept = 50)) +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE)+
+  labs(title = "High Range") +  # Add title for Plot A
+  theme(
+    legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
+    legend.text = element_text(size = 8)   # Shrink legend text
+  )
+
+plot_grid(low_range, high_range, labels = "AUTO", ncol = 1)
+ggsave("Figures/SimFigs/range_vis.pdf")
 #lowest observation error, medium gradient and range
-op <- get_operating_model_tw(150000, params[43,])
+op <- get_operating_model_tw(cold_pool_value, params[43,])
+sim_dat <- sampling(op,ice_value,35)
 
-ggplot(op, aes(X, Y)) +
+low_obv_err <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
   geom_hline(aes(yintercept = 50)) +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE)+
+  labs(title = "Low Observation Error") +  # Add title for Plot A
+  theme(
+    legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
+    legend.text = element_text(size = 8)   # Shrink legend text
+  )
+
 #highest observation error, medium gradient and range
-op <- get_operating_model_tw(150000, params[158,])
+op <- get_operating_model_tw(cold_pool_value, params[158,])
+sim_dat <- sampling(op,ice_value,35)
 
-ggplot(op, aes(X, Y)) +
+high_obv_err <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
   geom_hline(aes(yintercept = 50)) +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)
+  coord_cartesian(expand = FALSE)+
+  labs(title = "High Observation Error") +  # Add title for Plot A
+  theme(
+    legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
+    legend.text = element_text(size = 8)   # Shrink legend text
+  )
+
+plot_grid(low_obv_err, high_obv_err, labels = "AUTO", ncol = 1)
+ggsave("Figures/SimFigs/obv_error_vis.pdf")

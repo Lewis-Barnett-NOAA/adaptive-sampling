@@ -194,7 +194,7 @@ sampling <- function(d, ice_value, n) {
   
   if (ind_error == TRUE) {
     # Define sampling proportions based on ice_value
-    if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {
+    if (ice_value >= high_ice[1] && ice_value <= high_ice[2]) {jjj
       prop_north <- 0.1
       prop_south <- 0.9
     } else if (ice_value >= mid_ice[1] && ice_value <= mid_ice[2]) {
