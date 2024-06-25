@@ -126,8 +126,8 @@ abundance <- function(d, ice_value, cold_pool_value, n,
       samples_south <- sample(d[d$strata == 2, "observed"], n*0.75)
       
     } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
-      samples_north <- sample(d[d$strata == 1, "observed"], n*0.6)
-      samples_south <- sample(d[d$strata == 2, "observed"], n*0.4)
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
     }
     # estimate abundance
     est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
@@ -147,8 +147,8 @@ abundance <- function(d, ice_value, cold_pool_value, n,
       samples_south <- sample(d[d$strata == 2, "observed"], n*0.75)
       
     } else if (cold_pool_value >= 0 && cold_pool_value <= low_cp[2]) {
-      samples_north <- sample(d[d$strata == 1, "observed"], n*0.6)
-      samples_south <- sample(d[d$strata == 2, "observed"], n*0.4)
+      samples_north <- sample(d[d$strata == 1, "observed"], n*0.5)
+      samples_south <- sample(d[d$strata == 2, "observed"], n*0.5)
     }
     # estimate abundance
     est <- sum(mean(samples_north) * nrow(d[d$strata == 1,]), 
@@ -201,8 +201,8 @@ sampling <- function(d, ice_value, n) {
       prop_north <- 0.25
       prop_south <- 0.75
     } else if (ice_value >= low_ice[1] && ice_value <= low_ice[2]) {
-      prop_north <- 0.6
-      prop_south <- 0.4
+      prop_north <- 0.5
+      prop_south <- 0.5
     }
   }
   
