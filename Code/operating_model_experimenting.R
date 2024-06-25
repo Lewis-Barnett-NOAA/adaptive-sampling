@@ -41,3 +41,70 @@ ggplot(sim_dat, aes(X, Y)) +
                         scale_fill_viridis_c() +
                         scale_size_area() +
                         coord_cartesian(expand = FALSE)
+
+# plot operating model map with observations ----
+
+
+#strongest gradient with medium range and medium observation error
+params
+ice_value <- sample(ordersimsx$march_sea_ice,1)
+cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,][sample(1:(ncol(ordersimsx)-1), 1)])
+
+d <- get_operating_model_tw(cold_pool_value, params[88, ])
+
+sim_dat <- sampling(d,ice_value,100)
+#op <- get_operating_model_tw(150000, params[88,])
+
+ggplot(d, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+#weakest gradient with medium range and medium observation error
+op <- get_operating_model_tw(150000, params[8,])
+
+ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+
+#medium gradient with lowest range and medium observation error
+op <- get_operating_model_tw(150000, params[46,])
+
+ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+#medium gradient with highest range and medium observation error
+op <- get_operating_model_tw(150000, params[50,])
+
+ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+#lowest observation error, medium gradient and range
+op <- get_operating_model_tw(150000, params[43,])
+
+ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
+#highest observation error, medium gradient and range
+op <- get_operating_model_tw(150000, params[158,])
+
+ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_hline(aes(yintercept = 50)) +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_cartesian(expand = FALSE)
