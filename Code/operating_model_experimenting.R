@@ -57,11 +57,11 @@ sim_dat <- sampling(d,ice_value,35)
 
 strng_grad <- ggplot(d, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)+
+  coord_fixed(ratio = 1,expand = FALSE)+
   labs(title = "Strong Gradient") +  # Add title for Plot A
   theme(
     legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
@@ -73,18 +73,18 @@ sim_dat <- sampling(op,ice_value,35)
 
 wk_grad <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)+
+  coord_fixed(ratio = 1, expand = FALSE)+
   labs(title = "Weak Gradient")+
   theme(
     legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
     legend.text = element_text(size = 8)   # Shrink legend text
   )
 
-plot_grid(strng_grad, wk_grad, labels = "AUTO", ncol = 1)
+gradient <- plot_grid(strng_grad, wk_grad, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/gradient_vis.pdf")
 
 #medium gradient with lowest range and medium observation error
@@ -93,11 +93,11 @@ sim_dat <- sampling(op,ice_value,35)
 
 low_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)+
+  coord_fixed(ratio = 1, expand = FALSE)+
   labs(title = "Low Range") +  # Add title for Plot A
   theme(
     legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
@@ -109,18 +109,18 @@ sim_dat <- sampling(op,ice_value,35)
 
 high_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)+
+  coord_fixed(ratio = 1, expand = FALSE)+
   labs(title = "High Range") +  # Add title for Plot A
   theme(
     legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
     legend.text = element_text(size = 8)   # Shrink legend text
   )
 
-plot_grid(low_range, high_range, labels = "AUTO", ncol = 1)
+range <- plot_grid(low_range, high_range, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/range_vis.pdf")
 #lowest observation error, medium gradient and range
 op <- get_operating_model_tw(cold_pool_value, params[43,])
@@ -128,11 +128,11 @@ sim_dat <- sampling(op,ice_value,35)
 
 low_obv_err <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)+
+  coord_fixed(ratio = 1, expand = FALSE)+
   labs(title = "Low Observation Error") +  # Add title for Plot A
   theme(
     legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
@@ -145,16 +145,21 @@ sim_dat <- sampling(op,ice_value,35)
 
 high_obv_err <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21) +
-  geom_hline(aes(yintercept = 50)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
   scale_fill_viridis_c() +
   scale_size_area() +
-  coord_cartesian(expand = FALSE)+
+  coord_fixed(ratio = 1, expand = FALSE)+
   labs(title = "High Observation Error") +  # Add title for Plot A
   theme(
     legend.key.size = unit(0.5, 'lines'),  # Shrink legend size
     legend.text = element_text(size = 8)   # Shrink legend text
   )
 
-plot_grid(low_obv_err, high_obv_err, labels = "AUTO", ncol = 1)
+obserr <- plot_grid(low_obv_err, high_obv_err, labels = "AUTO", ncol = 1)
 ggsave("Figures/SimFigs/obv_error_vis.pdf")
+
+plot_grid(gradient, range, obserr, ncol = 3)
+ggsave("Figures/SimFigs/group_plot.pdf")
+
+
