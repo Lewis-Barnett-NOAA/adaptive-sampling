@@ -1,3 +1,5 @@
+library(sdmTMB)
+
 set.seed(123)
 
 N = 1000
@@ -9,7 +11,7 @@ predictor_dat <- data.frame(
 predictor_dat$temperature_scaled <- scale(predictor_dat$temperature)
 
 #get triangulated mesh to simulate from
-mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", n_knots = 200)
+mesh <- make_mesh(predictor_dat, xy_cols = c("X", "Y"), type = "cutoff_search", n_knots = 350)
 #plot(mesh)
 
 # #define parameters to loop over in operating models
@@ -26,7 +28,7 @@ sim_dat <- sdmTMB_simulate(
   mesh = mesh,
   family = tweedie(),
   range = 200,
-  phi = 0.1, # dispersion
+  phi = 0.01, # dispersion
   sigma_O = 0.2,
   tweedie_p = 1.9,
   B = c(0.2, 0.2) # B0 = intercept, B1 = a1 slope
