@@ -1,4 +1,5 @@
 library(sdmTMB)
+library(ggplot2)
 
 set.seed(123)
 
@@ -27,15 +28,12 @@ sim_dat <- sdmTMB_simulate(
   data = predictor_dat,
   mesh = mesh,
   family = tweedie(),
-  range = 200,
-  phi = 0.01, # dispersion
+  range = 10,
+  phi = 0.5, # dispersion
   sigma_O = 0.2,
   tweedie_p = 1.9,
   B = c(0.2, 0.2) # B0 = intercept, B1 = a1 slope
 )
-
-hist(exp(sim_dat$eta))
-hist(sim_dat$observed)
 
 ggplot(sim_dat, aes(X, Y)) +
  geom_raster(aes(fill = exp(eta))) +
@@ -43,6 +41,9 @@ ggplot(sim_dat, aes(X, Y)) +
                         scale_fill_viridis_c() +
                         scale_size_area() +
                         coord_cartesian(expand = FALSE)
+
+hist(exp(sim_dat$eta))
+hist(sim_dat$observed)
 
 # plot operating model map with observations ----
 
