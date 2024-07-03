@@ -70,6 +70,24 @@ strng_grad <- ggplot(d, aes(X, Y)) +
     legend.position = "none",  # Remove legend
     plot.title = element_text(hjust = 0.5)
   )
+
+#intermediate
+op <- get_operating_model_tw(cold_pool_value, params[53,])
+sim_dat <- sampling(op,ice_value,35)
+
+mid_grad <- ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_fixed(ratio = 1, expand = FALSE)+
+  labs(title = "Mid Gradient")+
+  theme(
+    legend.position = "none",  # Remove legend
+    plot.title = element_text(hjust = 0.5)
+  )
+
 #weakest gradient with medium range and medium observation error
 op <- get_operating_model_tw(cold_pool_value, params[8,])
 sim_dat <- sampling(op,ice_value,35)
@@ -87,7 +105,7 @@ wk_grad <- ggplot(op, aes(X, Y)) +
     plot.title = element_text(hjust = 0.5)
   )
 
-gradient <- plot_grid(strng_grad, wk_grad, labels = "AUTO", ncol = 1)
+gradient <- plot_grid(strng_grad, mid_grad, wk_grad, labels = "AUTO", ncol = 3)
 ggsave("Figures/SimFigs/gradient_vis.pdf")
 
 #medium gradient with lowest range and medium observation error
@@ -106,7 +124,26 @@ low_range <- ggplot(op, aes(X, Y)) +
     legend.position = "none",  # Remove legend
     plot.title = element_text(hjust = 0.5)
   )
-#medium gradient with highest range and medium observation error
+
+
+
+#mid range
+op <- get_operating_model_tw(cold_pool_value, params[48,])
+sim_dat <- sampling(op,ice_value,35)
+
+mid_range <- ggplot(op, aes(X, Y)) +
+  geom_raster(aes(fill = eta)) +
+  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
+  geom_hline(aes(yintercept = 50), color = "red") +
+  scale_fill_viridis_c() +
+  scale_size_area() +
+  coord_fixed(ratio = 1, expand = FALSE)+
+  labs(title = "Mid Range") +  # Add title for Plot A
+  theme(
+    legend.position = "none",  # Remove legend
+    plot.title = element_text(hjust = 0.5)
+  )
+#high range
 op <- get_operating_model_tw(cold_pool_value, params[50,])
 sim_dat <- sampling(op,ice_value,35)
 
@@ -123,7 +160,7 @@ high_range <- ggplot(op, aes(X, Y)) +
     plot.title = element_text(hjust = 0.5)
   )
 
-range <- plot_grid(low_range, high_range, labels = "AUTO", ncol = 1)
+range <- plot_grid(low_range, mid_range, high_range, labels = "AUTO", ncol = 3)
 ggsave("Figures/SimFigs/range_vis.pdf")
 #lowest observation error, medium gradient and range
 
@@ -180,7 +217,7 @@ legend <- get_legend(
 
 
 combined_plot <- plot_grid(
-  plot_grid(strng_grad, wk_grad, high_range, low_range, ncol = 2)
+  plot_grid(strng_grad, mid_grad, wk_grad, high_range, mid_range, low_range, ncol = 3)
 )
 
 combined_plot
@@ -205,9 +242,11 @@ low_phi
 high_phi <- filter(results_example, results_example[,2]==0.3)
 high_phi
 
-
+pdf("Figures/SimFigs/phi_abund.pdf")
 par(mfrow= c(1,2))
 
 hist(low_phi$est)
 hist(high_phi$est)
+
+dev.off()
 
