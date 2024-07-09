@@ -37,6 +37,7 @@ params$B1_high <- params$B1_low + 0.6
 # replicate parameter df once per simulation replicate
 n_rep <- 150
 params <- replicate_df(params, time_name = "sim_id", time_values = 1:n_rep)
+saveRDS(params, "parameters.RDS")
 
 # define empty object to house results dataframe
 results_adapt <- data.frame(matrix(NA, nrow(params), ncol(params) + 6))
