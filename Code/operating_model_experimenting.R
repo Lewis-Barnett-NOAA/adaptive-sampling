@@ -61,7 +61,7 @@ sim_dat <- sampling(d,ice_value,35)
 strng_grad <- ggplot(d, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
+  geom_hline(aes(yintercept = 50), color = "red", linewidth = 0.5) +
   scale_fill_viridis_c() +
   scale_size_area() +
   coord_fixed(ratio = 1,expand = FALSE)+
@@ -72,13 +72,13 @@ strng_grad <- ggplot(d, aes(X, Y)) +
   )
 
 #intermediate
-op <- get_operating_model_tw(cold_pool_value, params[53,])
+op <- get_operating_model_tw(cold_pool_value, params[73,])
 sim_dat <- sampling(op,ice_value,35)
 
 mid_grad <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
+  geom_hline(aes(yintercept = 50), color = "red", linewidth = 0.5) +
   scale_fill_viridis_c() +
   scale_size_area() +
   coord_fixed(ratio = 1, expand = FALSE)+
@@ -89,13 +89,13 @@ mid_grad <- ggplot(op, aes(X, Y)) +
   )
 
 #weakest gradient with medium range and medium observation error
-op <- get_operating_model_tw(cold_pool_value, params[8,])
+op <- get_operating_model_tw(cold_pool_value, params[58,])
 sim_dat <- sampling(op,ice_value,35)
 
 wk_grad <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
+  geom_hline(aes(yintercept = 50), color = "red", linewidth = 0.5) +
   scale_fill_viridis_c() +
   scale_size_area() +
   coord_fixed(ratio = 1, expand = FALSE)+
@@ -115,7 +115,7 @@ sim_dat <- sampling(op,ice_value,35)
 low_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
+  geom_hline(aes(yintercept = 50), color = "red", linewidth = 0.5) +
   scale_fill_viridis_c() +
   scale_size_area() +
   coord_fixed(ratio = 1, expand = FALSE)+
@@ -134,7 +134,7 @@ sim_dat <- sampling(op,ice_value,35)
 mid_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
+  geom_hline(aes(yintercept = 50), color = "red", linewidth = 0.5) +
   scale_fill_viridis_c() +
   scale_size_area() +
   coord_fixed(ratio = 1, expand = FALSE)+
@@ -150,7 +150,7 @@ sim_dat <- sampling(op,ice_value,35)
 high_range <- ggplot(op, aes(X, Y)) +
   geom_raster(aes(fill = eta)) +
   geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
+  geom_hline(aes(yintercept = 50), color = "red", linewidth = 0.5) +
   scale_fill_viridis_c() +
   scale_size_area() +
   coord_fixed(ratio = 1, expand = FALSE)+
@@ -164,40 +164,7 @@ range <- plot_grid(low_range, mid_range, high_range, labels = "AUTO", ncol = 3)
 ggsave("Figures/SimFigs/range_vis.pdf")
 #lowest observation error, medium gradient and range
 
-op <- get_operating_model_tw(cold_pool_value, params[43,])
-sim_dat <- sampling(op,ice_value,35)
-
-low_obv_err <- ggplot(op, aes(X, Y)) +
-  geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
-  scale_fill_viridis_c() +
-  scale_size_area() +
-  coord_fixed(ratio = 1, expand = FALSE)+
-  theme(
-    legend.position = "none",  # Remove legend
-    plot.title = element_text(hjust = 0.5)
-  )
-
-#highest observation error, medium gradient and range
-op <- get_operating_model_tw(cold_pool_value, params[158,])
-sim_dat <- sampling(op,ice_value,35)
-
-high_obv_err <- ggplot(op, aes(X, Y)) +
-  geom_raster(aes(fill = eta)) +
-  geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
-  geom_hline(aes(yintercept = 50), color = "red") +
-  scale_fill_viridis_c() +
-  scale_size_area() +
-  coord_fixed(ratio = 1, expand = FALSE)+
-  labs(title = "High Observation Error") +  # Add title for Plot A
-  theme(
-    legend.position = "none",  # Remove legend
-    plot.title = element_text(hjust = 0.5)
-  )
-
-obserr <- plot_grid(low_obv_err, high_obv_err, labels = "AUTO", ncol = 1)
-ggsave("Figures/SimFigs/obv_error_vis.pdf")
+######
 
 # Extract the legend from one plot
 legend <- get_legend(
@@ -205,7 +172,7 @@ legend <- get_legend(
     geom_raster(aes(fill = eta)) +
     geom_point(aes(size = observed), data = sim_dat, pch = 21, color = "white") +
     geom_hline(aes(yintercept = 50), color = "red") +
-    scale_fill_viridis_c() +
+    scale_fill_viridis_c(name = "Truth") +
     scale_size_area() +
     coord_fixed(ratio = 1, expand = FALSE) +
     theme(
@@ -245,8 +212,8 @@ high_phi
 pdf("Figures/SimFigs/phi_abund.pdf")
 par(mfrow= c(1,2))
 
-hist(low_phi$est)
-hist(high_phi$est)
+hist(low_phi$truth, main = "low dispersion")
+hist(high_phi$truth, main = "high dispersion")
 
 dev.off()
 
