@@ -107,7 +107,7 @@ dev.off()
 ice_value <- sample(ordersimsx$march_sea_ice,1)
 cold_pool_value <- as.numeric(ordersimsx[ordersimsx$march_sea_ice == ice_value,][sample(1:(ncol(ordersimsx)-1), 1)])
 
-d <- get_operating_model_tw(cold_pool_value, params[88, ])
+d <- get_operating_model_tw(cold_pool_value, params[150, ])
 
 sim_dat <- sampling(d,ice_value,35)
 #op <- get_operating_model_tw(150000, params[88,])
@@ -126,7 +126,7 @@ strng_grad <- ggplot(d, aes(X, Y)) +
   )
 
 #intermediate
-op <- get_operating_model_tw(cold_pool_value, params[53,])
+op <- get_operating_model_tw(cold_pool_value, params[134,])
 sim_dat <- sampling(op,ice_value,35)
 
 mid_grad <- ggplot(op, aes(X, Y)) +
@@ -143,7 +143,7 @@ mid_grad <- ggplot(op, aes(X, Y)) +
   )
 
 #weakest gradient with medium range and medium observation error
-op <- get_operating_model_tw(cold_pool_value, params[8,])
+op <- get_operating_model_tw(cold_pool_value, params[118,])
 sim_dat <- sampling(op,ice_value,35)
 
 wk_grad <- ggplot(op, aes(X, Y)) +
@@ -163,7 +163,7 @@ gradient <- plot_grid(strng_grad, mid_grad, wk_grad, labels = "AUTO", ncol = 3)
 ggsave("Figures/SimFigs/gradient_vis.pdf")
 
 #medium gradient with lowest range and medium observation error
-op <- get_operating_model_tw(cold_pool_value, params[46,])
+op <- get_operating_model_tw(cold_pool_value, params[53,])
 sim_dat <- sampling(op,ice_value,35)
 
 low_range <- ggplot(op, aes(X, Y)) +
@@ -182,7 +182,7 @@ low_range <- ggplot(op, aes(X, Y)) +
 
 
 #mid range
-op <- get_operating_model_tw(cold_pool_value, params[48,])
+op <- get_operating_model_tw(cold_pool_value, params[55,])
 sim_dat <- sampling(op,ice_value,35)
 
 mid_range <- ggplot(op, aes(X, Y)) +
@@ -198,7 +198,7 @@ mid_range <- ggplot(op, aes(X, Y)) +
     plot.title = element_text(hjust = 0.5)
   )
 #high range
-op <- get_operating_model_tw(cold_pool_value, params[50,])
+op <- get_operating_model_tw(cold_pool_value, params[56,])
 sim_dat <- sampling(op,ice_value,35)
 
 high_range <- ggplot(op, aes(X, Y)) +
