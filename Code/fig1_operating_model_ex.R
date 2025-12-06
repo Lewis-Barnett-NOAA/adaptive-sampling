@@ -53,8 +53,8 @@ ggplot(sim_dat_1, aes(X, Y)) +
                         coord_cartesian(expand = FALSE)
 
 # simulated observed vs predicted
-hist(exp(sim_dat$eta))
-hist(sim_dat$observed)
+hist(exp(sim_dat_1$eta))
+hist(sim_dat_1$observed)
 
 #######
 #observation distribution constrasted between models with different dispersion
